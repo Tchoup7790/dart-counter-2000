@@ -1,4 +1,4 @@
-import type { GameMode } from '../enum/game-mode.enum'
+import type { GameMode } from '../enums/game-mode.enum'
 import type { Round } from './round.interface'
 import type { Team } from './team.interface'
 

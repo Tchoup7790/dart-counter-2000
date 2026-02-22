@@ -1,4 +1,4 @@
-import type { CrossState } from '../enum/cross-state.enum'
+import type { CrossState } from '../enums/cross-state.enum'
 
 export interface CricketNumberState {
   team: number
