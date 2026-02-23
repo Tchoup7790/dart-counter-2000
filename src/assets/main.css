@@ -50,7 +50,8 @@ body {
 
   display: flex;
   justify-content: center;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: scroll;
 
   background-color: var(--cs-base);
   /* Légère texture de bois/tapis */
@@ -97,9 +98,14 @@ button {
   font-family: inherit;
   cursor: pointer;
 
-  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--color-primary) 12%,
+    transparent
+  );
   color: var(--color-primary);
-  border: 1px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--color-primary) 30%, transparent);
   border-radius: var(--radius);
 
   display: inline-flex;
@@ -114,9 +120,18 @@ button {
 }
 
 button:hover {
-  background: color-mix(in srgb, var(--color-primary) 22%, transparent);
-  border-color: color-mix(in srgb, var(--color-primary) 55%, transparent);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--color-primary) 20%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--color-primary) 22%,
+    transparent
+  );
+  border-color: color-mix(
+    in srgb,
+    var(--color-primary) 55%,
+    transparent
+  );
+  box-shadow: 0 0 10px
+    color-mix(in srgb, var(--color-primary) 20%, transparent);
 }
 
 button:active {
@@ -125,26 +140,60 @@ button:active {
 
 /* Variante danger (annuler, bust…) */
 button.danger {
-  background: color-mix(in srgb, var(--color-secondary) 12%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--color-secondary) 12%,
+    transparent
+  );
   color: var(--color-secondary);
-  border-color: color-mix(in srgb, var(--color-secondary) 30%, transparent);
+  border-color: color-mix(
+    in srgb,
+    var(--color-secondary) 30%,
+    transparent
+  );
 }
 button.danger:hover {
-  background: color-mix(in srgb, var(--color-secondary) 22%, transparent);
-  border-color: color-mix(in srgb, var(--color-secondary) 55%, transparent);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--color-secondary) 20%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--color-secondary) 22%,
+    transparent
+  );
+  border-color: color-mix(
+    in srgb,
+    var(--color-secondary) 55%,
+    transparent
+  );
+  box-shadow: 0 0 10px
+    color-mix(in srgb, var(--color-secondary) 20%, transparent);
 }
 
 /* Variante accent (valider le score, finir le leg…) */
 button.accent {
-  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--color-accent) 14%,
+    transparent
+  );
   color: var(--color-accent);
-  border-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  border-color: color-mix(
+    in srgb,
+    var(--color-accent) 35%,
+    transparent
+  );
 }
 button.accent:hover {
-  background: color-mix(in srgb, var(--color-accent) 25%, transparent);
-  border-color: color-mix(in srgb, var(--color-accent) 60%, transparent);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent) 25%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--color-accent) 25%,
+    transparent
+  );
+  border-color: color-mix(
+    in srgb,
+    var(--color-accent) 60%,
+    transparent
+  );
+  box-shadow: 0 0 12px
+    color-mix(in srgb, var(--color-accent) 25%, transparent);
 }
 
 /* Input */
@@ -160,8 +209,13 @@ input {
   font-family: inherit;
   color: var(--cs-text);
 
-  background: color-mix(in srgb, var(--color-primary) 6%, var(--cs-surface));
-  border: 1px solid color-mix(in srgb, var(--color-primary) 20%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--color-primary) 6%,
+    var(--cs-surface)
+  );
+  border: 1px solid
+    color-mix(in srgb, var(--color-primary) 20%, transparent);
   border-radius: var(--radius);
 
   outline: none;
@@ -176,27 +230,54 @@ input::placeholder {
 }
 
 input:hover {
-  border-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
-  background: color-mix(in srgb, var(--color-primary) 9%, var(--cs-surface));
+  border-color: color-mix(
+    in srgb,
+    var(--color-primary) 40%,
+    transparent
+  );
+  background: color-mix(
+    in srgb,
+    var(--color-primary) 9%,
+    var(--cs-surface)
+  );
 }
 
 input:focus {
-  border-color: color-mix(in srgb, var(--color-primary) 65%, transparent);
-  background: color-mix(in srgb, var(--color-primary) 10%, var(--cs-surface));
+  border-color: color-mix(
+    in srgb,
+    var(--color-primary) 65%,
+    transparent
+  );
+  background: color-mix(
+    in srgb,
+    var(--color-primary) 10%,
+    var(--cs-surface)
+  );
   box-shadow:
-    0 0 0 3px color-mix(in srgb, var(--color-primary) 12%, transparent),
-    0 0 16px color-mix(in srgb, var(--color-primary) 10%, transparent);
+    0 0 0 3px
+      color-mix(in srgb, var(--color-primary) 12%, transparent),
+    0 0 16px
+      color-mix(in srgb, var(--color-primary) 10%, transparent);
 }
 
 /* Input invalide / bust */
 input.error,
 input:invalid {
-  border-color: color-mix(in srgb, var(--cs-red) 55%, transparent);
-  background: color-mix(in srgb, var(--cs-red) 6%, var(--cs-surface));
+  border-color: color-mix(
+    in srgb,
+    var(--cs-red) 55%,
+    transparent
+  );
+  background: color-mix(
+    in srgb,
+    var(--cs-red) 6%,
+    var(--cs-surface)
+  );
 }
 input.error:focus,
 input:invalid:focus {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cs-red) 15%, transparent);
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--cs-red) 15%, transparent);
 }
 
 /* Select */
@@ -206,8 +287,13 @@ select {
   font-family: inherit;
   color: var(--cs-text);
 
-  background: color-mix(in srgb, var(--color-primary) 6%, var(--cs-surface));
-  border: 1px solid color-mix(in srgb, var(--color-primary) 20%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--color-primary) 6%,
+    var(--cs-surface)
+  );
+  border: 1px solid
+    color-mix(in srgb, var(--color-primary) 20%, transparent);
   border-radius: var(--radius);
   outline: none;
   cursor: pointer;
@@ -219,6 +305,11 @@ select {
 }
 
 select:focus {
-  border-color: color-mix(in srgb, var(--color-primary) 60%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 12%, transparent);
+  border-color: color-mix(
+    in srgb,
+    var(--color-primary) 60%,
+    transparent
+  );
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--color-primary) 12%, transparent);
 }
