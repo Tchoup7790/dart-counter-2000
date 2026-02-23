@@ -1,0 +1,5 @@
+export enum STATUS {
+  SETUP = 'SETUP',
+  PLAYING = 'PLAYING',
+  FINISHED = 'FINISHED',
+}
