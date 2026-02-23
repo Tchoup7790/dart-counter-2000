@@ -65,7 +65,7 @@ const modes: {
     color: 'var(--cs-green)',
   },
   {
-    id: GameMode.TWOHUNDREDTWENTYONE,
+    id: GameMode.TWO_HUNDRED_TWENTY_ONE,
     label: '221',
     sub: 'Course aux points',
     icon: '⬆️',

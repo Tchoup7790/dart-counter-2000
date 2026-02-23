@@ -146,30 +146,16 @@ export const useGameStore = defineStore('game', {
       })
     },
 
-    subtractPoints(
-      teamIndex: number,
-      playerIndex: number,
-      amount: number,
-    ) {
-      this.teams[teamIndex]!.players[playerIndex]!.points -=
-        amount
+    subtractPoints(teamIndex: number, amount: number) {
+      this.teams[teamIndex]!.points -= amount
     },
 
-    addPoints(
-      teamIndex: number,
-      playerIndex: number,
-      amount: number,
-    ) {
-      this.teams[teamIndex]!.players[playerIndex]!.points +=
-        amount
+    addPoints(teamIndex: number, amount: number) {
+      this.teams[teamIndex]!.points += amount
     },
 
-    restorePoints(
-      teamIndex: number,
-      playerIndex: number,
-      value: number,
-    ) {
-      this.teams[teamIndex]!.players[playerIndex]!.points = value
+    restorePoints(teamIndex: number, value: number) {
+      this.teams[teamIndex]!.points = value
     },
 
     reset() {

@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
 import './assets/main.css'
-import '@dartbot/dartboard'
+import '@dartbot/dartboard/dartboard.js'
 
 import App from './App.vue'
 import router from './router'

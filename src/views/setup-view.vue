@@ -82,7 +82,7 @@
       <!-- OPTIONS 221 -->
       <section
         class="section"
-        v-if="state.mode === GameMode.TWOHUNDREDTWENTYONE"
+        v-if="state.mode === GameMode.TWO_HUNDRED_TWENTY_ONE"
       >
         <h3 class="section-title">⚙️ Options 221</h3>
         <div class="toggle-list">
@@ -286,7 +286,7 @@ function updateName(
 // Options actives selon le mode
 const activeOptions = computed(() => {
   switch (state.mode) {
-    case GameMode.TWOHUNDREDTWENTYONE:
+    case GameMode.TWO_HUNDRED_TWENTY_ONE:
       return state.twoHundredTwentyTwoOptions
     case GameMode.CRICKET:
       return state.cricketOptions
