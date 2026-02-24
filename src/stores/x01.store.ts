@@ -124,6 +124,7 @@ export const useX01Store = defineStore('X01', {
       }
 
       this.currentValidThrows.push(dart)
+      this.currentScore = nextScore
 
       // Vérification de la Victoire
       // * score === 0
@@ -133,17 +134,15 @@ export const useX01Store = defineStore('X01', {
           validThrows: this.currentValidThrows,
           bust: false,
           winner: true,
-          pointsToSubstract: this.currentScore! - nextScore,
+          pointsToSubstract: this.currentScore - nextScore,
         }
       }
-
-      this.currentScore = nextScore
 
       return {
         validThrows: this.currentValidThrows,
         bust: false,
         winner: false,
-        pointsToSubstract: this.currentScore,
+        pointsToSubstract: this.currentScore - nextScore,
       }
     },
 
@@ -168,13 +167,13 @@ export const useX01Store = defineStore('X01', {
     // Check si l'index de joueur existe
     checkIfPlayerExist() {
       if (
-        !this.currentTeamIndex ||
-        !this.currentPlayerIndex ||
-        !this.currentScore ||
-        !this.hasStarted[this.currentTeamIndex] ||
-        this.hasStarted[this.currentTeamIndex]!.length <= 0 ||
-        !this.hasStarted[this.currentTeamIndex]![
-          this.currentPlayerIndex
+        !this.currentTeamIndex === undefined ||
+        !this.currentPlayerIndex === undefined ||
+        !this.currentScore === undefined ||
+        !this.hasStarted[this.currentTeamIndex!] ||
+        this.hasStarted[this.currentTeamIndex!]!.length <= 0 ||
+        !this.hasStarted[this.currentTeamIndex!]![
+          this.currentPlayerIndex!
         ]
       ) {
         throw new Error('processRound: Team or Player not Setup')
