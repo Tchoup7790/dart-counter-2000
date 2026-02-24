@@ -7,7 +7,6 @@ export interface CricketOptions {
 
 export interface RoundResultCricket {
   validThrows: DartThrow[]
-  pointDeltas: { teamIndex: number; delta: number }[]
   winner: boolean
   pointsToAdd: number
 }
