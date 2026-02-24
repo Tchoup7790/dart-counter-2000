@@ -3,6 +3,7 @@ import type {
   RoundResult221,
   TwoHundredTwentyOneOptions,
 } from '@/models/interfaces/two-hundred-twenty-one.interface'
+import { TARGET_221 } from '@/utils/constantes'
 import { defineStore } from 'pinia'
 
 export interface TwoHundredTwentyOneState {
@@ -14,8 +15,6 @@ export interface TwoHundredTwentyOneState {
   currentDartThrow: number
   currentValidThrows: DartThrow[]
 }
-
-const TARGET = 221
 
 export const use221Store = defineStore('221', {
   state: () =>
@@ -85,7 +84,7 @@ export const use221Store = defineStore('221', {
       // * score supérieur à la TARGET
       // * score à 1 alors que besoin d'un double
       if (
-        nextScore > TARGET ||
+        nextScore > TARGET_221 ||
         (nextScore === 1 && this.options.doubleOut)
       ) {
         return {
@@ -103,7 +102,7 @@ export const use221Store = defineStore('221', {
       // * score === TARGET
       // * cf. Vérification Bust
       if (
-        nextScore === TARGET &&
+        nextScore === TARGET_221 &&
         this.isValidClosingDart(dart)
       ) {
         return {

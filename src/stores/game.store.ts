@@ -4,9 +4,11 @@ import type { TwoHundredTwentyOneOptions } from '@/models/interfaces/two-hundred
 import type { AtcOptions } from '@/models/interfaces/arround-the-clock.interface'
 import type { CricketOptions } from '@/models/interfaces/cricket.interface'
 import type { DartThrow } from '@/models/interfaces/dart-throw.interface'
-import type { Player } from '@/models/interfaces/player.interface'
+import type {
+  Team,
+  Player,
+} from '@/models/interfaces/player.interface'
 import type { Round } from '@/models/interfaces/round.interface'
-import type { Team } from '@/models/interfaces/team.interface'
 import type { X01Options } from '@/models/interfaces/x01.interface'
 import { defineStore } from 'pinia'
 

@@ -3,9 +3,8 @@ import type {
   RoundResultCricket,
 } from '@/models/interfaces/cricket.interface'
 import type { DartThrow } from '@/models/interfaces/dart-throw.interface'
+import { DEFAULT_CRICKET_VARIANTS } from '@/utils/constantes'
 import { defineStore } from 'pinia'
-
-const DEFAULT_CRICKET_VARIANTS = [15, 16, 17, 18, 19, 20, 25]
 
 export interface CricketState {
   cricketBoard: number[][]
