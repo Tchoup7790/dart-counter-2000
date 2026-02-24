@@ -123,13 +123,9 @@ export const useCricketStore = defineStore('Cricket', {
 
     // vérification de si un board est complément fermé
     checkIfBoardComplete(): boolean {
-      this.cricketBoard[this.currentTeamIndex!]!.forEach(
-        (elt) => {
-          if (elt < 3) return false
-        },
+      return this.cricketBoard[this.currentTeamIndex!]!.every(
+        (elt) => elt >= 3,
       )
-
-      return true
     },
 
     // ajout de la valeur au cricketBoard
@@ -162,7 +158,10 @@ export const useCricketStore = defineStore('Cricket', {
 
     // annuler le dernier le lancer
     cancelThrow(): RoundResultCricket {
-      const value = this.currentValidThrows[-1]!.value
+      const value =
+        this.currentValidThrows[
+          this.currentValidThrows.length - 1
+        ]!.value
 
       const valueIndex = this.cricketTarget.findIndex(
         (elt) => elt === value,
@@ -182,11 +181,11 @@ export const useCricketStore = defineStore('Cricket', {
     // Check si l'index de joueur existe
     checkIfPlayerExist() {
       if (
-        !this.currentTeamIndex ||
-        !this.currentPlayerIndex ||
-        !this.currentScore ||
-        !this.cricketBoard[this.currentTeamIndex] ||
-        this.cricketBoard[this.currentTeamIndex]!.length <= 0
+        !this.currentTeamIndex === undefined ||
+        !this.currentPlayerIndex === undefined ||
+        !this.currentScore === undefined ||
+        !this.cricketBoard[this.currentTeamIndex!] ||
+        this.cricketBoard[this.currentTeamIndex!]!.length <= 0
       ) {
         throw new Error('processRound: Team or Player not Setup')
       }
