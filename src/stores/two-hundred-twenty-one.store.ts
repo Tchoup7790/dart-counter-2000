@@ -173,7 +173,8 @@ export const use221Store = defineStore('221', {
       if (
         !this.currentTeamIndex ||
         !this.currentPlayerIndex ||
-        !this.currentScore
+        !this.currentScore ||
+        !this.allScores[this.currentTeamIndex]
       ) {
         throw new Error('processRound: Team or Player not Setup')
       }
