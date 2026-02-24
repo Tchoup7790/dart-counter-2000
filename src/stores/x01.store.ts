@@ -99,7 +99,6 @@ export const useX01Store = defineStore('X01', {
         }
       }
 
-      // vérification ouverture
       const nextScore = this.currentScore! - dart.value
 
       // Vérification d'un bust
@@ -144,6 +143,24 @@ export const useX01Store = defineStore('X01', {
         bust: false,
         winner: false,
         pointsToSubstract: this.currentScore,
+      }
+    },
+
+    // annuler le dernier le lancer
+    cancelThrow(): RoundResultX01 {
+      this.currentScore! -=
+        this.currentValidThrows[
+          this.currentDartThrow! - 1
+        ]!.value
+
+      this.currentDartThrow--
+      this.currentValidThrows.pop()
+
+      return {
+        validThrows: this.currentValidThrows,
+        bust: false,
+        winner: false,
+        pointsToSubstract: this.currentScore ?? 0,
       }
     },
 

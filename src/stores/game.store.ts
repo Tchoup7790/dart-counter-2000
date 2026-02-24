@@ -140,9 +140,7 @@ export const useGameStore = defineStore('game', {
 
     resetPlayerPoints() {
       this.teams.forEach((team: Team) => {
-        team.players.forEach((player: Player) => {
-          player.points = 0
-        })
+        team.points = 0
       })
     },
 

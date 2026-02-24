@@ -6,7 +6,8 @@ export interface TwoHundredTwentyOneOptions {
 
 export interface RoundResult221 {
   validThrows: DartThrow[]
-  pointsToAdd: number
-  resetToZero: boolean
+  bust: boolean
+  resetToZero: number[]
   winner: boolean
+  pointsToAdd: number
 }
