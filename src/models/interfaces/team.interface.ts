@@ -4,4 +4,5 @@ export interface Team {
   players: Player[]
   name: string
   points: number
+  color?: string
 }
