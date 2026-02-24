@@ -184,7 +184,6 @@ export const useCricketStore = defineStore('Cricket', {
         !this.currentTeamIndex === undefined ||
         !this.currentPlayerIndex === undefined ||
         !this.currentScore === undefined ||
-        !this.cricketBoard[this.currentTeamIndex!] ||
         this.cricketBoard[this.currentTeamIndex!]!.length <= 0
       ) {
         throw new Error('processRound: Team or Player not Setup')

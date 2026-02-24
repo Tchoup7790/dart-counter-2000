@@ -170,11 +170,7 @@ export const useX01Store = defineStore('X01', {
         !this.currentTeamIndex === undefined ||
         !this.currentPlayerIndex === undefined ||
         !this.currentScore === undefined ||
-        !this.hasStarted[this.currentTeamIndex!] ||
-        this.hasStarted[this.currentTeamIndex!]!.length <= 0 ||
-        !this.hasStarted[this.currentTeamIndex!]![
-          this.currentPlayerIndex!
-        ]
+        this.hasStarted[this.currentTeamIndex!]!.length <= 0
       ) {
         throw new Error('processRound: Team or Player not Setup')
       }

@@ -96,17 +96,17 @@ export const useAtcStore = defineStore('Atc', {
       if (
         !this.options.mustDouble &&
         this.currentScore === 20 &&
-        (dart.value === 25 || dart.value === 50)
+        (dart.sector === 25 || dart.sector === 50)
       ) {
-        return dart.value
-      } else if (this.currentScore! + 1 === dart.value) {
-        return dart.value
+        return dart.sector
+      } else if (this.currentScore! + 1 === dart.sector) {
+        return dart.sector
       } else if (
         this.options.mustDouble &&
         this.currentScore === 20 &&
-        dart.value === 50
+        dart.sector === 50
       ) {
-        return dart.value
+        return dart.sector
       } else {
         return this.currentScore ?? 0
       }
@@ -140,9 +140,9 @@ export const useAtcStore = defineStore('Atc', {
     // Check si l'index de joueur existe
     checkIfPlayerExist() {
       if (
-        !this.currentTeamIndex ||
-        !this.currentPlayerIndex ||
-        !this.currentScore
+        !this.currentTeamIndex === undefined ||
+        !this.currentPlayerIndex === undefined ||
+        !this.currentScore === undefined
       ) {
         throw new Error('processRound: Team or Player not Setup')
       }

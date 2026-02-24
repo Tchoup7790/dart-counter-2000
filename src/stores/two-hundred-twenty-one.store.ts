@@ -171,10 +171,9 @@ export const use221Store = defineStore('221', {
     // Check si l'index de joueur existe
     checkIfPlayerExist() {
       if (
-        !this.currentTeamIndex ||
-        !this.currentPlayerIndex ||
-        !this.currentScore ||
-        !this.allScores[this.currentTeamIndex]
+        !this.currentTeamIndex === undefined ||
+        !this.currentPlayerIndex === undefined ||
+        !this.currentScore === undefined
       ) {
         throw new Error('processRound: Team or Player not Setup')
       }
