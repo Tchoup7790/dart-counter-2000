@@ -48,8 +48,9 @@ export const useX01Store = defineStore('X01', {
         this.options.doubleIn || this.options.masterIn
 
       for (let i = 0; i < teamCount; i++) {
-        this.hasStarted[i] = Array(playersPerTeam[i]).fill(
-          !needsIn,
+        this.hasStarted[i] = Array.from(
+          { length: playersPerTeam[i]! },
+          () => !needsIn,
         )
       }
     },

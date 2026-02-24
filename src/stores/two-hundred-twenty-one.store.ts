@@ -40,7 +40,7 @@ export const use221Store = defineStore('221', {
       this.reset()
       this.options = options
 
-      this.allScores = Array(teamCount).fill(0)
+      this.allScores = Array.from({ length: teamCount }, () => 0)
     },
 
     // Initialisation d'un Round
