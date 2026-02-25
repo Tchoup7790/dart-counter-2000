@@ -103,7 +103,7 @@
                 class="btn-add-player"
                 :disabled="
                   state.teams.reduce(
-                    (s, t) => s + t.players.length,
+                    (s: number, t: Team) => s + t.players.length,
                     0,
                   ) >= 12
                 "
@@ -158,7 +158,7 @@
         <p class="counter">
           {{
             state.teams.reduce(
-              (s, t) => s + t.players.length,
+              (s: number, t: Team) => s + t.players.length,
               0,
             )
           }}/12 joueurs au total
@@ -280,6 +280,8 @@ import type { TwoHundredTwentyOneOptions } from '@/models/interfaces/two-hundred
 import type { CricketOptions } from '@/models/interfaces/cricket.interface'
 import type { AtcOptions } from '@/models/interfaces/arround-the-clock.interface'
 import {
+  DEFAULT_SOLO_PLAYERS,
+  DEFAULT_TEAM_PLAYERS,
   MODE_COLOR,
   MODE_LABEL,
   PLAYER_COLORS,
@@ -290,6 +292,7 @@ import { X01_VARIANTS } from '@/models/enums/x01-variants.enum'
 import { useRoute, useRouter } from 'vue-router'
 import OptionToggle from '@/components/option-toggle.vue'
 import ChipSelector from '@/components/chip-selector.vue'
+import { getId } from '@/utils/functions'
 
 const route = useRoute()
 const router = useRouter()
@@ -314,26 +317,8 @@ interface SetupViewState {
 const state: SetupViewState = reactive({
   visible: false,
   teamMode: false,
-  soloPlayers: [
-    { id: getId(), name: 'Joueur 1', color: PLAYER_COLORS[0]! },
-    { id: getId(), name: 'Joueur 2', color: PLAYER_COLORS[1]! },
-  ],
-  teams: [
-    {
-      id: getId(),
-      name: 'Équipe 1',
-      color: TEAM_COLORS[0]!,
-      points: 0,
-      players: [{ id: getId(), name: 'Joueur 1' }],
-    },
-    {
-      id: getId(),
-      name: 'Équipe 2',
-      color: TEAM_COLORS[1]!,
-      points: 0,
-      players: [{ id: getId(), name: 'Joueur 1' }],
-    },
-  ],
+  soloPlayers: DEFAULT_SOLO_PLAYERS,
+  teams: DEFAULT_TEAM_PLAYERS,
   x01Options: {
     startingPoints: X01_VARIANTS.X501,
     doubleIn: false,
@@ -358,18 +343,27 @@ const mode = route.params.mode as GameMode
 
 const accentColor = computed(() => MODE_COLOR[mode])
 
-function getId() {
-  return Math.random().toString(36).slice(2)
-}
-
 // Mode SOLO
 function addSoloPlayer() {
   if (state.soloPlayers.length >= 12) return
-  const idx = state.soloPlayers.length
+
+  // Extraire les numéros déjà utilisés
+  const usedNumbers = state.soloPlayers.map((p) => {
+    const match = p.name.match(/Joueur (\d+)/)
+    return match ? Number(match[1]) : 0
+  })
+
+  // Trouver le plus petit numéro libre
+  let nextNumber = 1
+  while (usedNumbers.includes(nextNumber)) {
+    nextNumber++
+  }
+
   state.soloPlayers.push({
     id: getId(),
-    name: `Joueur ${idx + 1}`,
-    color: PLAYER_COLORS[idx % PLAYER_COLORS.length]!,
+    name: `Joueur ${nextNumber}`,
+    color:
+      PLAYER_COLORS[(nextNumber - 1) % PLAYER_COLORS.length]!,
   })
 }
 
@@ -380,11 +374,24 @@ function removeSoloPlayer(idx: number) {
 
 // Mode ÉQUIPE
 function addTeam() {
-  const idx = state.teams.length
+  if (state.teams.length >= 12) return
+
+  // Récupérer les numéros déjà utilisés
+  const usedNumbers = state.teams.map((team) => {
+    const match = team.name.match(/Équipe (\d+)/)
+    return match ? Number(match[1]) : 0
+  })
+
+  // Trouver le plus petit numéro libre
+  let nextNumber = 1
+  while (usedNumbers.includes(nextNumber)) {
+    nextNumber++
+  }
+
   state.teams.push({
     id: getId(),
-    name: `Équipe ${idx + 1}`,
-    color: TEAM_COLORS[idx % TEAM_COLORS.length]!,
+    name: `Équipe ${nextNumber}`,
+    color: TEAM_COLORS[(nextNumber - 1) % TEAM_COLORS.length]!,
     points: 0,
     players: [{ id: getId(), name: 'Joueur 1' }],
   })
@@ -590,6 +597,7 @@ function goBack() {
   flex-direction: column;
   gap: 20px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 .setup-title {
   margin: 0;
@@ -656,6 +664,7 @@ function goBack() {
 .btn-remove {
   background: transparent;
   border: none;
+  box-shadow: none;
   color: var(--cs-muted);
   font-size: 12px;
   padding: 2px 6px;

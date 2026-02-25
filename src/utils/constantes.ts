@@ -1,5 +1,6 @@
 import { GameMode } from '@/models/enums/game-mode.enum'
 import { X01_VARIANTS } from '@/models/enums/x01-variants.enum'
+import { getId } from './functions'
 
 // Palettes
 export const TEAM_COLORS = [
@@ -11,6 +12,10 @@ export const TEAM_COLORS = [
   'var(--cs-rose)',
   'var(--cs-orange)',
   'var(--cs-blue)',
+  'var(--cs-pink)',
+  'var(--cs-lime)',
+  'var(--cs-teal)',
+  'var(--cs-amber)',
 ]
 
 export const PLAYER_COLORS = [
@@ -26,6 +31,29 @@ export const PLAYER_COLORS = [
   'var(--cs-lime)',
   'var(--cs-teal)',
   'var(--cs-amber)',
+]
+
+// Default team / players
+export const DEFAULT_SOLO_PLAYERS = [
+  { id: getId(), name: 'Joueur 1', color: PLAYER_COLORS[0]! },
+  { id: getId(), name: 'Joueur 2', color: PLAYER_COLORS[1]! },
+]
+
+export const DEFAULT_TEAM_PLAYERS = [
+  {
+    id: getId(),
+    name: 'Équipe 1',
+    color: TEAM_COLORS[0]!,
+    points: 0,
+    players: [{ id: getId(), name: 'Joueur 1' }],
+  },
+  {
+    id: getId(),
+    name: 'Équipe 2',
+    color: TEAM_COLORS[1]!,
+    points: 0,
+    players: [{ id: getId(), name: 'Joueur 1' }],
+  },
 ]
 
 // mode
