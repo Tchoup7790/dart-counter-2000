@@ -1,5 +1,8 @@
 <template>
-  <label class="option-toggle">
+  <label
+    class="option-toggle"
+    @click="$emit('update:modelValue', !modelValue)"
+  >
     <div class="ot-text">
       <span class="ot-label">{{ label }}</span>
       <span class="ot-desc" v-if="description">{{
@@ -10,7 +13,6 @@
     <div
       class="ot-track"
       :class="{ 'ot-track--on': modelValue }"
-      @click="$emit('update:modelValue', !modelValue)"
     >
       <div class="ot-thumb" />
     </div>
@@ -96,19 +98,20 @@ defineEmits<{
 /* Thumb */
 .ot-thumb {
   position: absolute;
-  top: 3px;
+  top: 50%;
   left: 3px;
   width: 14px;
   height: 14px;
   border-radius: 50%;
   background: var(--cs-muted);
+  transform: translateY(-50%);
   transition:
     transform 0.3s ease,
     background 0.3s ease;
 }
 
 .ot-track--on .ot-thumb {
-  transform: translateX(18px);
+  transform: translate(18px, -50%);
   background: var(--cs-green);
 }
 </style>
