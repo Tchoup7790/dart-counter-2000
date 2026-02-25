@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@dartbot/dartboard':
-        specifier: ^0.4.0
-        version: 0.4.0
       pinia:
         specifier: ^3.0.4
         version: 3.0.4(typescript@5.9.3)(vue@3.5.28(typescript@5.9.3))
@@ -217,9 +214,6 @@ packages:
   '@babel/types@7.29.0':
     resolution: {integrity: sha512-LwdZHpScM4Qz8Xw2iKSzS+cfglZzJGvofQICy7W7v4caru4EaAmyUuO6BGrbyQ2mYV11W0U8j5mBhd14dd3B0A==}
     engines: {node: '>=6.9.0'}
-
-  '@dartbot/dartboard@0.4.0':
-    resolution: {integrity: sha512-NK/iHtY1olQ4j2z7JWOjmMWUkYUuFy+DPZ+giSBb6TufTjX9eL08q6gNAgMx/6a8Cr1/EqA1tCmXIU/xLyPMXg==}
 
   '@esbuild/aix-ppc64@0.27.3':
     resolution: {integrity: sha512-9fJMTNFTWZMh5qwrBItuziu834eOCUcEqymSH7pY+zoMVEZg3gcPuBNxH1EvfVYe9h0x/Ptw8KBzv7qxb7l8dg==}
@@ -2021,8 +2015,6 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
-
-  '@dartbot/dartboard@0.4.0': {}
 
   '@esbuild/aix-ppc64@0.27.3':
     optional: true
