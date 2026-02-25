@@ -45,7 +45,7 @@
             v-for="(team, ti) in game.teams"
             :key="ti"
             :team-name="teamNames[ti]!"
-            :players="team.players.map((p) => p.name)"
+            :players="team.players.map((p: Player) => p.name)"
             :color="teamColors[ti]!"
             :score="teamScores[ti]!"
             :active="ti === game.activeTeamIndex"
@@ -89,7 +89,7 @@
         <DartboardOverlay
           ref="dartboardRef"
           :active-team-color="activeTeamColor"
-          :disabled="game.isFinished"
+          :disabled="game.isFinished || state.isBust"
           @dart-thrown="onDartThrown"
           @round-complete="onRoundComplete"
         />
@@ -175,11 +175,12 @@ import RoundHistory from '@/components/round-history.vue'
 import GameControls from '@/components/game-controls.vue'
 import DartboardOverlay from '@/components/dartboard-overlay.vue'
 import { ATC_SEQUENCE } from '@/utils/constantes'
+import type { Player } from '@/models/interfaces/player.interface'
 
 // Stores
 const game = useGameStore()
 const x01Store = useX01Store()
-const s221Store = use221Store()
+const twoHundredTwentyOneStore = use221Store()
 const cricketStore = useCricketStore()
 const atcStore = useAtcStore()
 const router = useRouter()
@@ -224,7 +225,7 @@ function initRoundForActive() {
       x01Store.initRound(ti, pi, score)
       break
     case GameMode.TWO_HUNDRED_TWENTY_ONE:
-      s221Store.initRound(ti, pi, score)
+      twoHundredTwentyOneStore.initRound(ti, pi, score)
       break
     case GameMode.CRICKET:
       cricketStore.initRound(ti, pi, score)
@@ -282,6 +283,7 @@ const atcProgressIndexes = computed(() =>
 
 // Handlers fléchettes
 function onDartThrown(dart: DartThrow): void {
+  if (state.isBust) return // bloque tout nouveau lancer après un bust
   state.liveThrows.push(dart)
   applyDartToModeStore(dart)
 }
@@ -296,22 +298,22 @@ function applyDartToModeStore(dart: DartThrow): void {
         triggerBust()
         return
       }
-      // currentScore dans le store = score restant après ce lancer
       game.restorePoints(
         ti,
         x01Store.currentScore ?? game.teams[ti]!.points,
       )
+      state.scoreSnapshot =
+        x01Store.currentScore ?? game.teams[ti]!.points
       if (result.winner) game.setWinner(ti)
       break
     }
 
     case GameMode.TWO_HUNDRED_TWENTY_ONE: {
-      const result = s221Store.processRound(dart)
+      const result = twoHundredTwentyOneStore.processRound(dart)
       if (result.bust) {
         triggerBust()
         return
       }
-      // Appliquer les resets à zéro des autres équipes
       result.resetToZero.forEach((val, idx) => {
         if (
           idx !== ti &&
@@ -321,11 +323,14 @@ function applyDartToModeStore(dart: DartThrow): void {
           game.restorePoints(idx, 0)
         }
       })
-      // currentScore dans le store = score accumulé après ce lancer
       game.restorePoints(
         ti,
-        s221Store.currentScore ?? game.teams[ti]!.points,
+        twoHundredTwentyOneStore.currentScore ??
+          game.teams[ti]!.points,
       )
+      state.scoreSnapshot =
+        twoHundredTwentyOneStore.currentScore ??
+        game.teams[ti]!.points
       if (result.winner) game.setWinner(ti)
       break
     }
@@ -350,6 +355,7 @@ function applyDartToModeStore(dart: DartThrow): void {
 function onRoundComplete(throws: DartThrow[]): void {
   game.commitRound(throws)
   state.liveThrows = []
+  state.isBust = false
 
   if (!game.isFinished) {
     initRoundForActive()
@@ -358,9 +364,20 @@ function onRoundComplete(throws: DartThrow[]): void {
 
 // Undo
 function handleUndo(): void {
-  if (state.liveThrows.length === 0) return
+  // Autoriser l'undo même en bust
+  const hasBust = state.isBust
 
-  // Annuler dans le store de mode
+  if (!hasBust && state.liveThrows.length === 0) return
+
+  if (hasBust) {
+    // Annuler le bust : restaurer le score d'avant le dart bustant
+    dartboardRef.value?.undoLastThrow()
+    game.restorePoints(game.activeTeamIndex, state.scoreSnapshot)
+    state.isBust = false
+    return
+  }
+
+  // Annuler un lancer normal
   let prevScore: number | undefined
 
   switch (game.gameMode) {
@@ -370,7 +387,7 @@ function handleUndo(): void {
       break
     }
     case GameMode.TWO_HUNDRED_TWENTY_ONE: {
-      const result = s221Store.cancelThrow()
+      const result = twoHundredTwentyOneStore.cancelThrow()
       prevScore = result.pointsToAdd
       break
     }
@@ -385,18 +402,13 @@ function handleUndo(): void {
     }
   }
 
-  // Restaurer le score dans le gameStore
   if (prevScore !== undefined) {
     game.restorePoints(game.activeTeamIndex, prevScore)
   }
 
-  // Annuler dans le dartboardOverlay
   dartboardRef.value?.undoLastThrow()
   state.liveThrows.pop()
   game.undoLastThrow()
-
-  // Retirer le bust visuel si on revient en arrière
-  if (state.isBust) state.isBust = false
 }
 
 // Validate manuel
@@ -407,7 +419,6 @@ function handleValidate(): void {
 // Bust
 function triggerBust(): void {
   state.isBust = true
-  setTimeout(() => (state.isBust = false), 1200)
 }
 
 // Navigation victoire
