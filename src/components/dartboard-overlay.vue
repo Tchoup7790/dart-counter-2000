@@ -186,6 +186,11 @@ interface DartboardClickDetail {
   point: { x: number; y: number }
 }
 
+const BOARD_SECTORS = [
+  20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9,
+  12, 5,
+]
+
 // Handler
 function handleBoardHit(
   event: CustomEvent<DartboardClickDetail>,
@@ -194,30 +199,25 @@ function handleBoardHit(
 
   const { sector, ring, point } = event.detail
 
-  // Ring 0 = miss, on ignore
-  if (ring === 0) return
+  if (ring === 0) return // miss
 
-  // Calculer sector et multiplier réels
-  let realSector = sector
+  // sector est un index, pas une valeur directe
+  let realSector: number
   let multiplier: 1 | 2 | 3 = 1
 
-  if (ring === 1) {
-    realSector = 50
-    multiplier = 2
-  } // double bull
-  else if (ring === 2) {
+  if (ring === undefined) {
+    realSector = 0
+    multiplier = 1
+  } else if (ring === 1) {
     realSector = 25
     multiplier = 1
-  } // single bull
-  else if (ring === 3) {
+  } else if (ring === 0) {
+    realSector = 50
     multiplier = 1
-  } // single
-  else if (ring === 4) {
-    multiplier = 3
-  } // triple
-  else if (ring === 5) {
-    multiplier = 2
-  } // double
+  } else {
+    realSector = BOARD_SECTORS[sector]!
+    multiplier = ring === 3 ? 3 : ring === 5 ? 2 : 1
+  }
 
   const dart: DartThrow = {
     sector: realSector,
