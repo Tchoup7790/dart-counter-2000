@@ -663,13 +663,6 @@ function goBack() {
   cursor: pointer;
   flex-shrink: 0;
   font-family: inherit;
-  transition:
-    color var(--transition),
-    background var(--transition);
-}
-.btn-remove:hover {
-  color: var(--cs-red);
-  background: color-mix(in srgb, var(--cs-red) 10%, transparent);
 }
 .btn-remove:disabled {
   opacity: 0.2;
