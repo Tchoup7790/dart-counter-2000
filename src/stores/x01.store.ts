@@ -148,7 +148,7 @@ export const useX01Store = defineStore('X01', {
 
     // annuler le dernier le lancer
     cancelThrow(): RoundResultX01 {
-      this.currentScore! -=
+      this.currentScore! +=
         this.currentValidThrows[
           this.currentDartThrow! - 1
         ]!.value

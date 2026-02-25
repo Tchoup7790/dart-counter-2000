@@ -569,17 +569,15 @@ function goBack() {
   color: var(--cs-subtle);
   background: transparent;
   border: none;
+  box-shadow: none;
   padding: 6px 10px;
   border-radius: 8px;
   cursor: pointer;
   font-family: inherit;
-  transition:
-    color var(--transition),
-    background var(--transition);
+  transition: color var(--transition);
 }
 .btn-back:hover {
   color: var(--cs-text);
-  background: var(--cs-overlay);
 }
 .mode-badge {
   font-size: 11px;
@@ -672,6 +670,10 @@ function goBack() {
   cursor: pointer;
   flex-shrink: 0;
   font-family: inherit;
+  transition: color var(--transition);
+}
+.btn-remove:hover {
+  color: var(--cs-text);
 }
 .btn-remove:disabled {
   opacity: 0.2;

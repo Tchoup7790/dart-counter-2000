@@ -25,6 +25,8 @@
               :class="{
                 'rh-dart--double': dart.multiplier === 2,
                 'rh-dart--triple': dart.multiplier === 3,
+                'rh-dart--bull': dart.sector === 50,
+                'rh-dart--single-bull': dart.sector === 25,
               }"
               >{{ label(dart) }}</span
             >
@@ -77,8 +79,8 @@ function total(r: Round): number {
 }
 
 function label(t: DartThrow): string {
-  if (t.sector === 50) return 'D.Bull'
-  if (t.sector === 25) return 'Bull'
+  if (t.sector === 50) return 'Bull'
+  if (t.sector === 25) return 'S-Bull'
   const p =
     t.multiplier === 3 ? 'T' : t.multiplier === 2 ? 'D' : ''
   return `${p}${t.sector}`
@@ -90,6 +92,7 @@ function label(t: DartThrow): string {
   display: flex;
   flex-direction: column;
   gap: 5px;
+  padding: 24px 0;
 }
 
 .rh-title {
@@ -152,12 +155,21 @@ function label(t: DartThrow): string {
 }
 .rh-dart--double {
   color: var(--cs-cyan);
+  font-weight: 700;
 }
 .rh-dart--triple {
   color: var(--cs-yellow);
   font-weight: 700;
 }
 
+.rh-dart--single-bull {
+  font-weight: 700;
+}
+
+.rh-dart--bull {
+  color: var(--cs-red);
+  font-weight: 700;
+}
 .rh-bust-label {
   font-size: 10px;
   font-weight: 700;

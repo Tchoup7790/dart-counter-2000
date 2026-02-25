@@ -1,16 +1,16 @@
 <template>
-  <div class="game-view" :class="state.visible ? 'visible' : ''">
-    <!-- BARRE DE STATUT -->
+  <div class="game-view" :class="{ visible: state.visible }">
+    <!-- Barre de statut -->
     <header class="game-bar">
       <div class="game-bar-left">
         <button
           class="btn-menu"
-          aria-label="Menu"
           @click="state.showMenu = true"
+          aria-label="Menu"
         >
           ☰
         </button>
-        <span class="game-mode-tag">{{
+        <span class="mode-tag">{{
           game.gameMode?.toUpperCase()
         }}</span>
       </div>
@@ -30,73 +30,83 @@
       </div>
     </header>
 
-    <!-- SCOREBOARD — adapté au mode -->
-    <section class="scoreboard-area">
-      <!-- X01 & 221 : cartes de score simples -->
-      <div
-        class="score-cards"
-        v-if="
-          game.gameMode === GameMode.X01 ||
-          game.gameMode === GameMode.TWO_HUNDRED_TWENTY_ONE
-        "
-      >
-        <ScoreCard
-          v-for="(team, ti) in game.teams"
-          :key="ti"
-          :team-name="teamNames[ti]!"
-          :players="team.players.map((p: Player) => p.name)"
-          :color="teamColors[ti]!"
-          :score="teamScores[ti]!"
-          :sub-info="subInfoForTeam(ti)"
-          :active="ti === game.activeTeamIndex"
-          :bust="state.isBust && ti === game.activeTeamIndex"
-          :winner="game.teamWinner === ti"
-          :live-delta="
-            ti === game.activeTeamIndex && liveTotal > 0
-              ? liveTotal
-              : undefined
+    <div class="above-fold">
+      <!-- Scoreboard -->
+      <section class="scoreboard-area">
+        <!-- X01 & 221 : cartes de score -->
+        <div
+          class="score-cards"
+          v-if="
+            game.gameMode === GameMode.X01 ||
+            game.gameMode === GameMode.TWO_HUNDRED_TWENTY_ONE
           "
-          :delta-sign="
-            game.gameMode === GameMode.X01 ? '−' : '+'
-          "
+        >
+          <ScoreCard
+            v-for="(team, ti) in game.teams"
+            :key="ti"
+            :team-name="teamNames[ti]!"
+            :players="team.players.map((p) => p.name)"
+            :color="teamColors[ti]!"
+            :score="teamScores[ti]!"
+            :active="ti === game.activeTeamIndex"
+            :bust="state.isBust && ti === game.activeTeamIndex"
+            :winner="game.teamWinner === ti"
+            :live-delta="
+              ti === game.activeTeamIndex && liveTotal > 0
+                ? liveTotal
+                : undefined
+            "
+            :delta-sign="
+              game.gameMode === GameMode.X01 ? '−' : '+'
+            "
+          />
+        </div>
+
+        <!-- Cricket -->
+        <CricketScoreboard
+          v-else-if="game.gameMode === GameMode.CRICKET"
+          :sectors="cricketStore.cricketTarget"
+          :sector-states="cricketSectorStates"
+          :bonus-points="teamScores"
+          :team-colors="teamColors"
+          :team-names="teamNames"
+          :active-team="game.activeTeamIndex"
+        />
+
+        <!-- ATC -->
+        <AtcProgress
+          v-else-if="game.gameMode === GameMode.ATC"
+          :progress-indexes="atcProgressIndexes"
+          :sequence="ATC_SEQUENCE"
+          :team-colors="teamColors"
+          :team-names="teamNames"
+          :active-team="game.activeTeamIndex"
+        />
+      </section>
+
+      <!-- Cible -->
+      <div class="board-area">
+        <DartboardOverlay
+          ref="dartboardRef"
+          :active-team-color="activeTeamColor"
+          :disabled="game.isFinished"
+          @dart-thrown="onDartThrown"
+          @round-complete="onRoundComplete"
         />
       </div>
 
-      <!-- Cricket : tableau des croix -->
-      <CricketScoreboard
-        v-else-if="game.gameMode === GameMode.CRICKET"
-        :sectors="cricket.activeSectors"
-        :sector-states="cricketSectorStates"
-        :bonus-points="cricket.bonusPoints"
-        :team-colors="teamColors"
-        :team-names="teamNames"
-        :active-team="game.activeTeamIndex"
-      />
-
-      <!-- ATC : barres de progression -->
-      <AtcProgress
-        v-else-if="game.gameMode === GameMode.ATC"
-        :progress-indexes="atc.progress"
-        :team-colors="teamColors"
-        :team-names="teamNames"
-        :active-team="game.activeTeamIndex"
-        :sequence="atc.ATC_SEQUENCE"
-      />
-    </section>
-
-    <!-- CIBLE INTERACTIVE -->
-    <div class="board-area">
-      <DartboardOverlay
-        ref="dartboardRef"
-        :active-team-color="activeTeamColor"
-        :historic-darts="state.previousDarts"
-        :disabled="game.isFinished"
-        @dart-thrown="onDartThrown"
-        @round-complete="onRoundComplete"
+      <!-- Contrôles -->
+      <GameControls
+        :throw-count="dartboardRef?.currentThrows?.length ?? 0"
+        :active-color="activeTeamColor"
+        :can-validate="
+          (dartboardRef?.currentThrows?.length ?? 0) > 0
+        "
+        @undo="handleUndo"
+        @validate="handleValidate"
       />
     </div>
-
-    <!-- HISTORIQUE DES VOLÉES (X01 / 221) -->
+    <!-- Historique-->
     <div
       class="history-area"
       v-if="
@@ -108,21 +118,10 @@
         :rounds="game.gameHistory"
         :team-colors="teamColors"
         :team-names="teamNames"
-        :max-visible="4"
       />
     </div>
 
-    <!-- CONTRÔLES  -->
-    <GameControls
-      :throw-count="state.liveThrows.length"
-      :active-color="activeTeamColor"
-      :can-validate="state.liveThrows.length > 0"
-      :checkout="checkout"
-      @undo="handleUndo"
-      @validate="handleValidate"
-    />
-
-    <!-- MENU PAUSE (drawer bas) -->
+    <!-- Menu pause -->
     <Transition name="menu">
       <div
         class="menu-overlay"
@@ -134,7 +133,6 @@
             <span class="menu-title">🎯 Partie en cours</span>
             <button
               class="btn-close"
-              aria-label="Fermer le menu"
               @click="state.showMenu = false"
             >
               ✕
@@ -151,7 +149,7 @@
               class="menu-item menu-item--danger"
               @click="quitGame"
             >
-              🚪 Quitter la partie
+              🚪 Quitter
             </button>
           </div>
         </div>
@@ -163,293 +161,272 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-
-import type { DartThrow } from '@/models/interfaces/dart-throw.interface'
-import type { X01Options } from '@/models/interfaces/x01.interface'
-import type { Player } from '@/models/interfaces/player.interface'
 import { useGameStore } from '@/stores/game.store'
+import { useX01Store } from '@/stores/x01.store'
+import { use221Store } from '@/stores/two-hundred-twenty-one.store'
+import { useCricketStore } from '@/stores/cricket.store'
+import { useAtcStore } from '@/stores/atc.store'
 import { GameMode } from '@/models/enums/game-mode.enum'
-import { useX01 } from '@/composables/use-X01'
-import { use221 } from '@/composables/use-221'
-import { useCricket } from '@/composables/use-cricket'
-import { useAtc } from '@/composables/use-atc'
-import type { TwoHundredTwentyOneOptions } from '@/models/interfaces/two-hundred-twenty-one.interface'
-import type { CricketOptions } from '@/models/interfaces/cricket.interface'
-import type { AtcOptions } from '@/models/interfaces/arround-the-clock.interface'
-import type { PlacedDart } from '@/models/interfaces/placed-dart.interface'
+import type { DartThrow } from '@/models/interfaces/dart-throw.interface'
 import ScoreCard from '@/components/score-card.vue'
 import CricketScoreboard from '@/components/cricket-scoreboard.vue'
 import AtcProgress from '@/components/atc-progress.vue'
-import DartboardOverlay from '@/components/dartboard-overlay.vue'
 import RoundHistory from '@/components/round-history.vue'
 import GameControls from '@/components/game-controls.vue'
+import DartboardOverlay from '@/components/dartboard-overlay.vue'
+import { ATC_SEQUENCE } from '@/utils/constantes'
 
-interface GameViewState {
+// Stores
+const game = useGameStore()
+const x01Store = useX01Store()
+const s221Store = use221Store()
+const cricketStore = useCricketStore()
+const atcStore = useAtcStore()
+const router = useRouter()
+
+// État local
+interface ViewState {
   visible: boolean
   showMenu: boolean
   isBust: boolean
-  previousDarts: PlacedDart[]
   liveThrows: DartThrow[]
+  scoreSnapshot: number
 }
 
-const state: GameViewState = reactive({
+const state = reactive<ViewState>({
   visible: false,
   showMenu: false,
   isBust: false,
-  previousDarts: [],
   liveThrows: [],
+  scoreSnapshot: 0,
 })
 
-// Store
-const game = useGameStore()
-const router = useRouter()
-
-// Instanciation des composables selon le mode
-const x01 = useX01(game.options as X01Options)
-const s221 = use221(game.options as TwoHundredTwentyOneOptions)
-const cricket = useCricket(
-  game.options as CricketOptions,
-  game.teams.length,
-)
-const atc = useAtc(game.options as AtcOptions)
-
-// Initialisation des états internes des composables
-onMounted(() => {
-  const teamPlayerCounts = game.teams.map(
-    (t) => t.players.length,
-  )
-  switch (game.gameMode) {
-    case GameMode.X01:
-      x01.init(game.teams.length, teamPlayerCounts)
-      break
-    case GameMode.CRICKET:
-      cricket.init()
-      break
-    case GameMode.ATC:
-      atc.init(game.teams.length)
-      break
-  }
-
-  setTimeout(() => (state.visible = true), 50)
-})
-
-// Ref composant cible
 const dartboardRef = ref<InstanceType<
   typeof DartboardOverlay
 > | null>(null)
 
-const activeTeamColor = computed(
-  () =>
-    game.teams[game.activeTeamIndex]?.players[0]?.color ??
-    'var(--cs-green)',
-)
+// Initialisation
+onMounted(() => {
+  initRoundForActive()
+  setTimeout(() => (state.visible = true), 50)
+})
 
+// Démarre un round dans le store de mode pour l'équipe/joueur actif.
+function initRoundForActive() {
+  const ti = game.activeTeamIndex
+  const pi = game.activePlayerIndex
+  const score = game.teams[ti]?.points ?? 0
+
+  state.scoreSnapshot = score
+
+  switch (game.gameMode) {
+    case GameMode.X01:
+      x01Store.initRound(ti, pi, score)
+      break
+    case GameMode.TWO_HUNDRED_TWENTY_ONE:
+      s221Store.initRound(ti, pi, score)
+      break
+    case GameMode.CRICKET:
+      cricketStore.initRound(ti, pi, score)
+      break
+    case GameMode.ATC:
+      atcStore.initRound(ti, pi, score)
+      break
+  }
+}
+
+// Computed
+// Couleur de l'équipe active.
+const activeTeamColor = computed(() => {
+  const team = game.teams[game.activeTeamIndex]
+  return team?.color ?? team?.color ?? 'var(--cs-green)'
+})
+
+// Couleur par équipe (même logique).
 const teamColors = computed(() =>
-  game.teams.map(
-    (t) => t.players[0]?.color ?? 'var(--cs-muted)',
-  ),
+  game.teams.map((t) => t.color ?? t.color ?? 'var(--cs-muted)'),
 )
 
+// Nom affiché par équipe.
 const teamNames = computed(() => game.teams.map((t) => t.name))
 
-// Score affiché par équipe
+// Scores affichés (team.points).
 const teamScores = computed(() =>
   game.teams.map((t) => t.points),
 )
 
-// Total live de la volée en cours
+// Total live de la volée en cours (pour affichage delta sur ScoreCard).
 const liveTotal = computed(() =>
   state.liveThrows.reduce((sum, t) => sum + t.value, 0),
 )
-
-// Checkout X01 suggéré pour l'équipe active
-const checkout = computed((): string | undefined => {
-  if (game.gameMode !== GameMode.X01) return undefined
-  const score = game.teams[game.activeTeamIndex]?.points
-  return score !== undefined
-    ? x01.suggestCheckout(score)
-    : undefined
-})
-
-// États des secteurs cricket pour le CricketScoreboard
+// États des secteurs pour CricketScoreboard.
 const cricketSectorStates = computed(() => {
   if (game.gameMode !== GameMode.CRICKET) return []
-  return cricket.activeSectors.map((sector) => ({
+  return cricketStore.cricketTarget.map((sector) => ({
     sector,
-    hitsPerTeam: game.teams.map((_, ti) =>
-      cricket.getHits(ti, sector),
-    ),
-    isComplete: cricket.isSectorComplete(sector),
+    hitsPerTeam: game.teams.map((_, ti) => {
+      const idx = cricketStore.cricketTarget.indexOf(sector)
+      return cricketStore.cricketBoard[ti]?.[idx] ?? 0
+    }),
+    isComplete: game.teams.every((_, ti) => {
+      const idx = cricketStore.cricketTarget.indexOf(sector)
+      return (cricketStore.cricketBoard[ti]?.[idx] ?? 0) >= 3
+    }),
   }))
 })
 
-// Handlers cible
+// Progression ATC par équipe (score courant = numéro atteint).
+const atcProgressIndexes = computed(() =>
+  game.teams.map((t) => t.points),
+)
+
+// Handlers fléchettes
 function onDartThrown(dart: DartThrow): void {
   state.liveThrows.push(dart)
-  game.registerThrow(dart)
+  applyDartToModeStore(dart)
+}
+
+function applyDartToModeStore(dart: DartThrow): void {
+  const ti = game.activeTeamIndex
+
+  switch (game.gameMode) {
+    case GameMode.X01: {
+      const result = x01Store.processRound(dart)
+      if (result.bust) {
+        triggerBust()
+        return
+      }
+      // currentScore dans le store = score restant après ce lancer
+      game.restorePoints(
+        ti,
+        x01Store.currentScore ?? game.teams[ti]!.points,
+      )
+      if (result.winner) game.setWinner(ti)
+      break
+    }
+
+    case GameMode.TWO_HUNDRED_TWENTY_ONE: {
+      const result = s221Store.processRound(dart)
+      if (result.bust) {
+        triggerBust()
+        return
+      }
+      // Appliquer les resets à zéro des autres équipes
+      result.resetToZero.forEach((val, idx) => {
+        if (
+          idx !== ti &&
+          val === 0 &&
+          game.teams[idx]!.points !== 0
+        ) {
+          game.restorePoints(idx, 0)
+        }
+      })
+      // currentScore dans le store = score accumulé après ce lancer
+      game.restorePoints(
+        ti,
+        s221Store.currentScore ?? game.teams[ti]!.points,
+      )
+      if (result.winner) game.setWinner(ti)
+      break
+    }
+
+    case GameMode.CRICKET: {
+      const result = cricketStore.processRound(dart)
+      game.addPoints(ti, result.pointsToAdd)
+      if (result.winner) game.setWinner(ti)
+      break
+    }
+
+    case GameMode.ATC: {
+      const result = atcStore.processRound(dart)
+      // En ATC, le score = le numéro courant atteint
+      game.restorePoints(ti, result.score)
+      if (result.winner) game.setWinner(ti)
+      break
+    }
+  }
 }
 
 function onRoundComplete(throws: DartThrow[]): void {
-  // Sauvegarder les positions pour l'overlay visuel de la prochaine volée
-  state.previousDarts = throws.map((t) => ({
-    throw: t,
-    teamIndex: game.activeTeamIndex,
-    playerColor: activeTeamColor.value,
-  }))
-
-  switch (game.gameMode) {
-    case GameMode.X01:
-      handleX01Round(throws)
-      break
-    case GameMode.TWO_HUNDRED_TWENTY_ONE:
-      handle221Round(throws)
-      break
-    case GameMode.CRICKET:
-      handleCricketRound(throws)
-      break
-    case GameMode.ATC:
-      handleAtcRound(throws)
-      break
-  }
-
+  game.commitRound(throws)
   state.liveThrows = []
+
+  if (!game.isFinished) {
+    initRoundForActive()
+  }
 }
 
+// Undo
 function handleUndo(): void {
+  if (state.liveThrows.length === 0) return
+
+  // Annuler dans le store de mode
+  let prevScore: number | undefined
+
+  switch (game.gameMode) {
+    case GameMode.X01: {
+      const result = x01Store.cancelThrow()
+      prevScore = result.pointsToSubstract
+      break
+    }
+    case GameMode.TWO_HUNDRED_TWENTY_ONE: {
+      const result = s221Store.cancelThrow()
+      prevScore = result.pointsToAdd
+      break
+    }
+    case GameMode.CRICKET: {
+      cricketStore.cancelThrow()
+      break
+    }
+    case GameMode.ATC: {
+      const result = atcStore.cancelThrow()
+      prevScore = result.score
+      break
+    }
+  }
+
+  // Restaurer le score dans le gameStore
+  if (prevScore !== undefined) {
+    game.restorePoints(game.activeTeamIndex, prevScore)
+  }
+
+  // Annuler dans le dartboardOverlay
   dartboardRef.value?.undoLastThrow()
   state.liveThrows.pop()
   game.undoLastThrow()
+
+  // Retirer le bust visuel si on revient en arrière
+  if (state.isBust) state.isBust = false
 }
 
+// Validate manuel
 function handleValidate(): void {
   dartboardRef.value?.forceCommit()
 }
 
-// Traitement X01
-function handleX01Round(throws: DartThrow[]): void {
-  const ti = game.activeTeamIndex
-  const pi = game.activePlayerIndex
-  const currentScore = game.teams[ti]?.points ?? 0
-
-  const result =
-    x01.processRound(ti, pi, currentScore, throws) ?? undefined
-
-  if (result!.bust) {
-    triggerBust()
-    game.commitRound([])
-    return
-  }
-
-  game.subtractPoints(ti, result!.pointsToSubstract ?? 0)
-
-  if (result!.winner) {
-    game.setWinner(ti)
-  }
-
-  game.commitRound(result!.validThrows)
-}
-
-// Traitement 221
-function handle221Round(throws: DartThrow[]): void {
-  const ti = game.activeTeamIndex
-  const currentScore = game.teams[ti]?.points ?? 0
-  const allScores = game.teams.map((t) => t.points)
-
-  const result = s221.processRound(
-    ti,
-    currentScore,
-    allScores,
-    throws,
-  )
-
-  if (result.resetToZero) {
-    game.restorePoints(ti, 0)
-  } else {
-    game.addPoints(ti, result.pointsToAdd)
-  }
-
-  if (result.winner) {
-    game.setWinner(ti)
-  }
-
-  game.commitRound(result.validThrows)
-}
-
-// Traitement Cricket
-function handleCricketRound(throws: DartThrow[]): void {
-  const ti = game.activeTeamIndex
-
-  const result = cricket.processRound(ti, throws)
-
-  // Appliquer les mutations de points bonus
-  result.pointDeltas.forEach(({ teamIndex, delta }) => {
-    if (delta > 0) game.addPoints(teamIndex, delta)
-    else if (delta < 0)
-      game.subtractPoints(teamIndex, Math.abs(delta))
-  })
-
-  if (result.winner !== undefined) {
-    game.setWinner(result.winner)
-  }
-
-  game.commitRound(throws)
-}
-
-// Traitement ATC
-function handleAtcRound(throws: DartThrow[]): void {
-  const ti = game.activeTeamIndex
-
-  const result = atc.processRound(ti, throws)
-
-  // ATC : les points = la progression (numéro atteint)
-  if (result.winner) {
-    game.setWinner(ti)
-  }
-
-  game.commitRound(throws)
-}
-
-// UI helpers
+// Bust
 function triggerBust(): void {
   state.isBust = true
-  setTimeout(() => {
-    state.isBust = false
-  }, 1200)
+  setTimeout(() => (state.isBust = false), 1200)
 }
 
-// Naviguer vers la victoire quand le store passe en FINISHED
+// Navigation victoire
 watch(
   () => game.isFinished,
   (finished) => {
-    if (finished) {
+    if (finished)
       setTimeout(() => router.push({ name: 'winner' }), 600)
-    }
   },
 )
 
+// Quitter
 function quitGame(): void {
   game.reset()
   router.push({ name: 'home' })
 }
-
-// Sous-info ScoreCard
-function subInfoForTeam(ti: number): string | undefined {
-  switch (game.gameMode) {
-    case GameMode.X01:
-      return x01.suggestCheckout(game.teams[ti]?.points ?? 0)
-    case GameMode.ATC: {
-      const prog = atc.progress[ti] ?? 0
-      const target = atc.nextTarget(ti)
-      return `${prog}/${atc.ATC_SEQUENCE.length} → ${target === 25 ? 'Bull' : target}`
-    }
-    default:
-      return undefined
-  }
-}
 </script>
 
 <style scoped>
-/* Entrée */
 .game-view {
   display: flex;
   flex-direction: column;
@@ -461,7 +438,7 @@ function subInfoForTeam(ti: number): string | undefined {
   opacity: 1;
 }
 
-/* Status bar */
+/* Barre */
 .game-bar {
   display: flex;
   align-items: center;
@@ -507,7 +484,7 @@ function subInfoForTeam(ti: number): string | undefined {
   background: var(--cs-overlay);
 }
 
-.game-mode-tag {
+.mode-tag {
   font-size: 10px;
   letter-spacing: 0.12em;
   color: var(--cs-muted);
@@ -557,13 +534,20 @@ function subInfoForTeam(ti: number): string | undefined {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 20px 44px; /* 44px = espace throw-summary */
+  padding: 6px 20px 38px;
   min-height: 260px;
+}
+
+/* Above fold */
+.above-fold {
+  min-height: calc(97vh - 32px);
+  display: flex;
+  flex-direction: column;
 }
 
 /* Historique */
 .history-area {
-  padding: 0 12px 4px;
+  padding: 0 12px;
 }
 
 /* Menu pause */
@@ -652,7 +636,7 @@ function subInfoForTeam(ti: number): string | undefined {
   );
 }
 
-/* Transition menu drawer */
+/* Transitions menu */
 .menu-enter-active,
 .menu-leave-active {
   transition: opacity 0.25s ease;

@@ -41,7 +41,6 @@
       <!-- Valider -->
       <button
         class="ctrl-btn ctrl-btn--validate"
-        :style="{ '--tc': activeColor }"
         :disabled="!canValidate"
         aria-label="Valider la volée"
         @click="emit('validate')"
@@ -75,8 +74,7 @@ const emit = defineEmits<{
 .game-controls {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 8px 20px 28px;
+  padding: 0 20px 14px;
 }
 
 /* Checkout hint */
@@ -174,24 +172,28 @@ const emit = defineEmits<{
 }
 
 .ctrl-btn--validate {
-  color: var(--tc);
+  color: var(--cs-green);
   background: color-mix(
     in srgb,
-    var(--tc) 10%,
+    var(--cs-green) 10%,
     var(--cs-surface)
   );
   border: 1px solid
-    color-mix(in srgb, var(--tc) 22%, transparent);
+    color-mix(in srgb, var(--cs-green) 22%, transparent);
 }
 .ctrl-btn--validate:not(:disabled):hover {
   background: color-mix(
     in srgb,
-    var(--tc) 20%,
+    var(--cs-green) 20%,
     var(--cs-surface)
   );
-  border-color: color-mix(in srgb, var(--tc) 50%, transparent);
+  border-color: color-mix(
+    in srgb,
+    var(--cs-green) 50%,
+    transparent
+  );
   box-shadow: 0 0 14px
-    color-mix(in srgb, var(--tc) 15%, transparent);
+    color-mix(in srgb, var(--cs-green) 15%, transparent);
 }
 .ctrl-btn--validate:not(:disabled):active {
   transform: scale(0.97);

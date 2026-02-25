@@ -97,7 +97,7 @@ function select(mode: GameMode) {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding: 0 24px 24px;
+  padding: 0 24px;
   gap: 48px;
   opacity: 0;
   transition: opacity 0.4s ease;

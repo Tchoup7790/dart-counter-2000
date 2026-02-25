@@ -2,6 +2,12 @@ import { GameMode } from '@/models/enums/game-mode.enum'
 import { X01_VARIANTS } from '@/models/enums/x01-variants.enum'
 import { getId } from './functions'
 
+// DartBoard
+export const BOARD_SECTORS = [
+  20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9,
+  12, 5,
+]
+
 // Palettes
 export const TEAM_COLORS = [
   'var(--cs-green)',

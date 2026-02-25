@@ -14,3 +14,9 @@ export interface PlacedDart {
   teamIndex: number
   playerColor: string
 }
+
+export interface DartboardClickDetail {
+  sector: number
+  ring: number
+  point: { x: number; y: number }
+}
