@@ -229,7 +229,6 @@ function handleBoardHit(
 
   const added = addThrow(dart)
   if (!added) return
-  console.log(dart)
   emit('dart-thrown', dart)
   if (isRoundComplete()) {
     setTimeout(() => emit('round-complete', commitRound()), 0)

@@ -50,7 +50,7 @@ body {
 
   display: flex;
   justify-content: center;
-  overflow: hidden;
+  overflow-x: hidden;
 
   background-color: var(--cs-base);
   /* Légère texture de bois/tapis */
