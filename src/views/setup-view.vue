@@ -792,8 +792,8 @@ function goBack() {
   min-width: 0;
   background: transparent;
   border: none;
-  border-bottom: 1px solid transparent;
-  padding: 2px 4px;
+  border: 2px solid transparent;
+  padding: 4px 6px;
   font-size: 13px;
   font-family: inherit;
   color: var(--cs-text);
@@ -801,7 +801,7 @@ function goBack() {
   transition: border-color var(--transition);
 }
 .field:focus {
-  border-bottom-color: var(--tc, var(--cs-green));
+  border-color: var(--tc, var(--cs-green));
 }
 .field::placeholder {
   color: var(--cs-muted);
