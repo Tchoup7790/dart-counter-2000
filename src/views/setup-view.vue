@@ -868,25 +868,36 @@ function goBack() {
 }
 
 /* Transitions */
-.row-enter-active {
-  transition:
-    opacity 0.25s,
-    transform 0.25s;
-}
+.row-enter-active,
 .row-leave-active {
   transition:
-    opacity 0.2s,
-    transform 0.2s;
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.row-leave-active {
   position: absolute;
   width: 100%;
 }
+
 .row-enter-from {
   opacity: 0;
   transform: translateX(-8px);
 }
+
 .row-leave-to {
   opacity: 0;
   transform: translateX(8px);
+}
+
+.row-move {
+  transition: transform 0.25s ease;
+}
+
+.solo-list,
+.teams-list,
+.player-list {
+  position: relative;
 }
 
 @keyframes fadeIn {
