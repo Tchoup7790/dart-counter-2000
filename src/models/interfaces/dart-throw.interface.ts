@@ -5,3 +5,9 @@ export interface DartThrow {
   x: number
   y: number
 }
+
+export interface PlacedDart {
+  throw: DartThrow
+  teamIndex: number
+  playerColor: string
+}

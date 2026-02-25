@@ -1,6 +1,8 @@
 import type { BoardHitEvent } from '@/models/interfaces/board.interface'
-import type { DartThrow } from '@/models/interfaces/dart-throw.interface'
-import type { PlacedDart } from '@/models/interfaces/placed-dart.interface'
+import type {
+  DartThrow,
+  PlacedDart,
+} from '@/models/interfaces/dart-throw.interface'
 
 const BOARD_SECTORS = [
   20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9,

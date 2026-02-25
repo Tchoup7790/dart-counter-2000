@@ -69,14 +69,14 @@ export const use221Store = defineStore('221', {
     processRound(dart: DartThrow): RoundResult221 {
       this.checkIfPlayerExist()
 
-      // incrément du nombre de fléchette jouer
-      this.currentDartThrow++
-
       if (this.currentDartThrow >= 3) {
         throw new Error(
           'processRound: déjà trois fléchettes de lancées',
         )
       }
+
+      // incrément du nombre de fléchette jouer
+      this.currentDartThrow++
 
       const nextScore = this.currentScore! + dart.value
 

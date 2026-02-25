@@ -82,14 +82,14 @@ export const useX01Store = defineStore('X01', {
     processRound(dart: DartThrow): RoundResultX01 {
       this.checkIfPlayerExist()
 
-      // incrément du nombre de fléchette jouer
-      this.currentDartThrow++
-
       if (this.currentDartThrow >= 3) {
         throw new Error(
           'processRound: déjà trois fléchettes de lancées',
         )
       }
+
+      // incrément du nombre de fléchette jouer
+      this.currentDartThrow++
 
       if (!this.checkIfPlayerCanPlay(dart)) {
         return {

@@ -61,14 +61,14 @@ export const useAtcStore = defineStore('Atc', {
     processRound(dart: DartThrow): RoundResultAtc {
       this.checkIfPlayerExist()
 
-      // incrément du nombre de fléchette jouer
-      this.currentDartThrow++
-
       if (this.currentDartThrow >= 3) {
         throw new Error(
           'processRound: déjà trois fléchettes de lancées',
         )
       }
+
+      // incrément du nombre de fléchette jouer
+      this.currentDartThrow++
 
       this.currentScore = this.nextScore(dart)
       this.currentValidThrows.push(dart)

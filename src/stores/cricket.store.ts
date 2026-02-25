@@ -87,14 +87,14 @@ export const useCricketStore = defineStore('Cricket', {
     processRound(dart: DartThrow): RoundResultCricket {
       this.checkIfPlayerExist()
 
-      // incrément du nombre de fléchette jouer
-      this.currentDartThrow++
-
       if (this.currentDartThrow >= 3) {
         throw new Error(
           'processRound: déjà trois fléchettes de lancées',
         )
       }
+
+      // incrément du nombre de fléchette jouer
+      this.currentDartThrow++
 
       const dartValue = this.getDartValue(dart)
       this.currentValidThrows.push(dart)

@@ -20,10 +20,7 @@
         class="player-row"
       >
         <!-- Pastille couleur -->
-        <span
-          class="player-dot"
-          :style="{ background: player.color }"
-        />
+        <span class="player-dot" />
 
         <!-- Nom éditable -->
         <input

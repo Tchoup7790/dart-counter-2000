@@ -109,8 +109,10 @@
 
 <script setup lang="ts">
 import { useDartboard } from '@/composables/use-dartboard'
-import type { DartThrow } from '@/models/interfaces/dart-throw.interface'
-import type { PlacedDart } from '@/models/interfaces/placed-dart.interface'
+import type {
+  DartThrow,
+  PlacedDart,
+} from '@/models/interfaces/dart-throw.interface'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 // Props
@@ -129,7 +131,6 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 // Emits
-
 const emit = defineEmits<{
   (e: 'dart-thrown', dart: DartThrow): void
   (e: 'round-complete', throws: DartThrow[]): void
@@ -228,6 +229,7 @@ function handleBoardHit(
 
   const added = addThrow(dart)
   if (!added) return
+  console.log(dart)
   emit('dart-thrown', dart)
   if (isRoundComplete()) {
     setTimeout(() => emit('round-complete', commitRound()), 0)
