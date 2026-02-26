@@ -194,6 +194,7 @@ const state: GameBarLayout = reactive({
   display: flex;
   flex-direction: column;
   overflow-y: scroll;
+  padding: 12px;
 }
 
 /* ── Menu pause ── */

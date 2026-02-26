@@ -147,6 +147,7 @@ watch(
   min-height: calc(100vh - 53px);
   opacity: 0;
   transition: opacity 0.35s ease;
+  overflow: hidden;
 }
 .view.visible {
   opacity: 1;

@@ -83,7 +83,7 @@ function giveThrowLabel(dart: DartThrow) {
 .game-controls {
   display: flex;
   flex-direction: column;
-  padding: 24px 12px 14px;
+  width: 100%;
 }
 
 .throw-summary {
