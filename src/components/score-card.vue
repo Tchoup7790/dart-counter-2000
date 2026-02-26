@@ -2,57 +2,56 @@
   <div
     class="score-card"
     :class="{
-      'score-card--active': active,
-      'score-card--bust': bust,
-      'score-card--winner': winner,
+      'score-card--active': props.active,
+      'score-card--bust': props.bust,
+      'score-card--winner': props.winner,
     }"
-    :style="{ '--cs': color }"
+    :style="{ '--tc': props.color }"
   >
     <!-- En-tête -->
     <div class="sc-header">
       <div class="sc-meta">
-        <span class="sc-team-name">{{ teamName }}</span>
-        <span class="sc-players">{{ players.join(' · ') }}</span>
+        <span class="sc-team-name">{{ props.name }}</span>
+        <span v-if="players.length > 1" class="sc-players">{{
+          props.players.join(' · ')
+        }}</span>
       </div>
 
-      <span v-if="bust" class="sc-badge sc-badge--bust"
+      <span v-if="props.bust" class="sc-badge sc-badge--bust"
         >BUST</span
       >
-      <span v-else-if="winner" class="sc-badge sc-badge--winner"
+      <span
+        v-else-if="props.winner"
+        class="sc-badge sc-badge--winner"
         >🏆</span
-      >
-      <span v-else-if="active" class="sc-badge sc-badge--active"
-        >▶</span
       >
     </div>
 
     <!-- Score + delta live -->
     <div class="sc-score-row">
-      <span class="sc-score">{{ score }}</span>
+      <span class="sc-score">{{ props.score }}</span>
 
       <Transition name="delta">
         <span
-          v-if="liveDelta !== undefined && liveDelta > 0"
+          v-if="
+            props.liveDelta !== undefined && props.liveDelta > 0
+          "
           class="sc-delta"
-          :style="{
-            color:
-              deltaSign === '−'
-                ? 'var(--cs-yellow)'
-                : 'var(--cs-green)',
-          }"
-          >{{ deltaSign }}{{ liveDelta }}</span
+          >{{ props.deltaSign }}{{ props.liveDelta }}</span
         >
       </Transition>
     </div>
 
     <!-- Sous-info (checkout, progression…) -->
-    <span class="sc-sub" v-if="subInfo">{{ subInfo }}</span>
+    <span class="sc-sub" v-if="props.subInfo">{{
+      props.subInfo
+    }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
 interface Props {
-  teamName: string
+  name: string
   players: string[]
   color: string
   score: number
@@ -64,11 +63,17 @@ interface Props {
   subInfo?: string
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
+  name: '',
+  players: () => [],
+  color: 'var(--cs-green)',
+  score: 0,
   active: false,
   bust: false,
   winner: false,
+  liveDelta: 0,
   deltaSign: '−',
+  subInfo: undefined,
 })
 </script>
 
@@ -175,6 +180,7 @@ withDefaults(defineProps<Props>(), {
   color: var(--tc);
   white-space: nowrap;
   overflow: hidden;
+  text-align: start;
   text-overflow: ellipsis;
 }
 
@@ -206,11 +212,6 @@ withDefaults(defineProps<Props>(), {
 .sc-badge--winner {
   font-size: 14px;
   padding: 0;
-}
-
-.sc-badge--active {
-  color: var(--tc);
-  font-size: 11px;
 }
 
 /* Score */

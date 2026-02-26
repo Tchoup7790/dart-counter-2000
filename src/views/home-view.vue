@@ -17,6 +17,7 @@
           '--accent': mode.color,
           '--delay': `${i * 80}ms`,
         }"
+        :disabled="mode.id !== GameMode.X01"
         @click="select(mode.id)"
       >
         <span class="mode-icon">{{ mode.icon }}</span>

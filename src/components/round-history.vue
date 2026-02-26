@@ -1,20 +1,30 @@
 <template>
-  <div class="round-history" v-if="rounds.length">
+  <div class="round-history">
     <p class="rh-title">Historique</p>
-    <TransitionGroup name="row" tag="div" class="rh-list">
+    <div class="rh-list">
       <div
-        v-for="(round, i) in visible"
-        :key="`${round.team}-${i}`"
+        v-for="round in x01Store.gameHistory"
+        :key="`${round.teamIndex}`"
         class="rh-row"
-        :class="{ 'rh-row--bust': isBust(round) }"
         :style="{
-          '--tc': teamColors[round.team] ?? 'var(--cs-muted)',
+          '--tc':
+            x01Store.teamColors[round.teamIndex] ??
+            'var(--cs-muted)',
         }"
       >
         <span class="rh-dot" />
 
+        <span class="rh-name">
+          {{
+            x01Store.teams[round.teamIndex]!.players[
+              round.playerIndex
+            ]!.name
+          }}
+          -
+        </span>
+
         <div class="rh-throws">
-          <span v-if="isBust(round)" class="rh-bust-label"
+          <span v-if="round.isBust" class="rh-bust-label"
             >BUST</span
           >
           <template v-else>
@@ -33,50 +43,17 @@
           </template>
         </div>
 
-        <span class="rh-total" v-if="!isBust(round)">{{
-          total(round)
-        }}</span>
+        <span class="rh-total">{{ round.score }}</span>
       </div>
-    </TransitionGroup>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import type { DartThrow } from '@/models/interfaces/dart-throw.interface'
+import { useX01Store } from '@/stores/x01.store'
 
-interface DartThrow {
-  sector: number
-  multiplier: number
-  value: number
-}
-
-interface Round {
-  team: number
-  throws: DartThrow[]
-}
-
-interface Props {
-  rounds: Round[]
-  teamColors: string[]
-  teamNames: string[]
-  maxVisible?: number
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  maxVisible: 5,
-})
-
-const visible = computed(() =>
-  [...props.rounds].reverse().slice(0, props.maxVisible),
-)
-
-function isBust(r: Round): boolean {
-  return r.throws.length === 0
-}
-
-function total(r: Round): number {
-  return r.throws.reduce((s, t) => s + t.value, 0)
-}
+const x01Store = useX01Store()
 
 function label(t: DartThrow): string {
   if (t.sector === 50) return 'Bull'
@@ -93,6 +70,7 @@ function label(t: DartThrow): string {
   flex-direction: column;
   gap: 5px;
   padding: 24px 0;
+  width: 100%;
 }
 
 .rh-title {
@@ -113,20 +91,11 @@ function label(t: DartThrow): string {
 .rh-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
+  gap: 12px;
+  padding: 12px 14px;
   background: var(--cs-surface);
-  border-left: 2px solid var(--tc);
+  border: 1px solid var(--cs-muted);
   border-radius: 7px;
-}
-
-.rh-row--bust {
-  border-left-color: var(--cs-red);
-  background: color-mix(
-    in srgb,
-    var(--cs-red) 4%,
-    var(--cs-surface)
-  );
 }
 
 .rh-dot {
@@ -136,8 +105,11 @@ function label(t: DartThrow): string {
   background: var(--tc);
   flex-shrink: 0;
 }
-.rh-row--bust .rh-dot {
-  background: var(--cs-red);
+
+.rh-name {
+  font-size: 12px;
+  color: var(--cs-subtle);
+  letter-spacing: 0.03em;
 }
 
 .rh-throws {
@@ -149,16 +121,16 @@ function label(t: DartThrow): string {
 }
 
 .rh-dart {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--cs-subtle);
   letter-spacing: 0.03em;
 }
 .rh-dart--double {
-  color: var(--cs-cyan);
+  color: var(--cs-green);
   font-weight: 700;
 }
 .rh-dart--triple {
-  color: var(--cs-yellow);
+  color: var(--cs-red);
   font-weight: 700;
 }
 
@@ -178,10 +150,9 @@ function label(t: DartThrow): string {
 }
 
 .rh-total {
-  font-size: 13px;
+  font-size: 12px;
+  color: var(--cs-subtle);
   font-weight: 700;
-  color: var(--cs-text);
-  min-width: 26px;
   text-align: right;
 }
 

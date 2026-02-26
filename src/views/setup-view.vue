@@ -392,7 +392,7 @@ function addTeam() {
     id: getId(),
     name: `Équipe ${nextNumber}`,
     color: TEAM_COLORS[(nextNumber - 1) % TEAM_COLORS.length]!,
-    points: 0,
+    score: 0,
     players: [{ id: getId(), name: 'Joueur 1' }],
   })
 }
@@ -451,7 +451,7 @@ function startGame() {
       id: p.id,
       name: p.name,
       color: p.color,
-      points: 0,
+      score: 0,
       players: [
         {
           id: p.id,
@@ -465,7 +465,7 @@ function startGame() {
       id: t.id,
       name: t.name,
       color: t.color,
-      points: 0,
+      score: 0,
       players: t.players.map(
         (p) =>
           ({
@@ -505,13 +505,9 @@ function startGame() {
 
   switch (mode) {
     case GameMode.X01:
-      x01Store.init(
-        state.x01Options,
-        builtTeams.length,
-        builtTeams.map((t) => t.players.length),
-      )
+      x01Store.init(state.x01Options, builtTeams)
       builtTeams.forEach((_, ti) =>
-        game.restorePoints(ti, state.x01Options.startingPoints),
+        game.setPoints(ti, state.x01Options.startingPoints),
       )
       break
     case GameMode.TWO_HUNDRED_TWENTY_ONE:
@@ -528,11 +524,19 @@ function startGame() {
     case GameMode.ATC:
       activeOptions = state.atcOptions
       atcStore.init(state.atcOptions)
-      builtTeams.forEach((_, ti) => game.restorePoints(ti, 1))
+      builtTeams.forEach((_, ti) => game.setPoints(ti, 1))
       break
   }
 
-  router.push({ name: 'game' })
+  if (mode === GameMode.X01) {
+    router.push({ name: 'X01' })
+  } else if (mode === GameMode.TWO_HUNDRED_TWENTY_ONE) {
+    router.push({ name: '221' })
+  } else if (mode === GameMode.CRICKET) {
+    router.push({ name: 'Cricket' })
+  } else if (mode === GameMode.ATC) {
+    router.push({ name: 'Arround The Clock' })
+  }
 }
 
 function goBack() {

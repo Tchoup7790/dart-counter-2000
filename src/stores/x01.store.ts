@@ -1,25 +1,25 @@
 import { X01_VARIANTS } from '@/models/enums/x01-variants.enum'
 import type { DartThrow } from '@/models/interfaces/dart-throw.interface'
+import type { Team } from '@/models/interfaces/player.interface'
+import type { Round } from '@/models/interfaces/round.interface'
 import type {
-  RoundResultX01,
+  CurrentRoundX01,
+  ProcessRoundResultX01,
   X01Options,
 } from '@/models/interfaces/x01.interface'
 import { defineStore } from 'pinia'
 
 export interface X01State {
-  hasStarted: boolean[][]
   options: X01Options
-  currentTeamIndex: number | undefined
-  currentPlayerIndex: number | undefined
-  currentScore: number | undefined
-  currentDartThrow: number
-  currentValidThrows: DartThrow[]
+  current: CurrentRoundX01
+  hasStarted: Record<string, boolean>
+  teams: Team[]
+  gameHistory: Round[]
 }
 
 export const useX01Store = defineStore('X01', {
   state: () =>
     ({
-      hasStarted: [],
       options: {
         startingPoints: X01_VARIANTS.X301,
         doubleIn: false,
@@ -27,171 +27,208 @@ export const useX01Store = defineStore('X01', {
         masterIn: false,
         masterOut: false,
       },
-      currentTeamIndex: undefined,
-      currentPlayerIndex: undefined,
-      currentScore: undefined,
-      currentDartThrow: 0,
-      currentValidThrows: [],
+      current: {
+        teamIndex: 0,
+        playerIndex: 0,
+        scoreSnapshot: 0,
+        dartThrows: [],
+        isBust: false,
+      },
+      hasStarted: {},
+      teams: [],
+      gameHistory: [],
     }) as X01State,
+
+  getters: {
+    // Renvoie l'index de la dernière équipe
+    lastTeamIndex(): number {
+      return this.teams.length - 1
+    },
+    // Renvoie l'index du dernier joueur de la dernière équipe
+    lastPlayerIndex(): number {
+      return this.teams[this.lastTeamIndex]!.players.length - 1
+    },
+    // Renvoie l'équipe en train de jouer
+    currentTeam(): Team {
+      return this.teams[this.current.teamIndex]!
+    },
+    // Donnes les points fait pendant le tour
+    delta(): number {
+      return this.current.dartThrows.reduce(
+        (s, dart: DartThrow) => s + dart.value,
+        0,
+      )
+    },
+    // Renvoie le score avec le Round en cours
+    currentScore(): number {
+      return this.currentTeam.score - this.delta
+    },
+    // Renvoie les couleurs des équipes
+    teamColors(): string[] {
+      return this.teams.map((team) => team.color)
+    },
+    // Renvoie les noms des équipes
+    teamNames(): string[] {
+      return this.teams.map((team) => team.name)
+    },
+    // Donnes le nombre de round joué
+    roundNumber(): number {
+      return (
+        Math.floor(this.gameHistory.length / this.teams.length) +
+        1
+      )
+    },
+  },
 
   actions: {
     // Initialisation du jeu
-    init(
-      options: X01Options,
-      teamCount: number,
-      playersPerTeam: number[],
-    ) {
+    init(options: X01Options, teams: Team[]) {
+      // Il y a au moins un joueur
+      if (teams.length < 1)
+        throw new Error('init: teams.length < 1.')
+
+      // Chaque équipe a au moins un joueur
+      teams.forEach((team, i) => {
+        if (team.players.length < 1)
+          throw new Error(`init: team[${i}] has no players`)
+      })
+
+      // Les ids sont uniques (évite les collisions dans hasStarted)
+      const ids = teams.map((t) => t.id)
+      if (new Set(ids).size !== ids.length)
+        throw new Error('init: duplicate team ids')
+
       this.reset()
       this.options = options
+      this.teams = teams
 
       const needsIn: boolean =
         this.options.doubleIn || this.options.masterIn
 
-      for (let i = 0; i < teamCount; i++) {
-        this.hasStarted[i] = Array.from(
-          { length: playersPerTeam[i]! },
-          () => !needsIn,
-        )
-      }
+      teams.forEach((team) => {
+        // Remplissage du tableau de démarrage
+        this.hasStarted[team.id] = !needsIn
+      })
     },
 
     // Initialisation d'un Round
-    initRound(
-      teamIndex: number,
-      playerIndex: number,
-      score: number,
-    ) {
-      this.resetRound()
+    initRound() {
+      // Le store a bien été initialisé
+      if (this.teams.length < 1)
+        throw new Error('initRound: call init() first')
 
-      // Vérification d'un nouveau joueur / équipe
-      if (
-        this.currentTeamIndex === teamIndex &&
-        this.currentPlayerIndex === playerIndex
-      ) {
+      // L'équipe courante existe encore
+      if (!this.teams[this.current.teamIndex])
+        throw new Error('initRound: team not found')
+
+      // Le joueur courant existe dans l'équipe
+      const currentTeam = this.teams[this.current.teamIndex]!
+      if (!currentTeam.players[this.current.playerIndex])
         throw new Error(
-          'initRound: PlayerIndex And TeamIndex already set',
+          'initRound: player not found in current team',
         )
+
+      if (this.gameHistory.length !== 0) {
+        // Passage à l'équipe suivante
+        if (this.current.teamIndex >= this.lastTeamIndex) {
+          // On revient à la première équipe
+          this.current.teamIndex = 0
+        } else {
+          // Équipe suivante
+          this.current.teamIndex++
+        }
+
+        // Le joueur dépend du round
+        this.current.playerIndex =
+          this.roundNumber % this.currentTeam.players.length
+      } else {
+        this.current.playerIndex = 0
+        this.current.teamIndex = 0
       }
 
-      this.currentTeamIndex = teamIndex
-      this.currentPlayerIndex = playerIndex
-      this.currentScore = score
+      this.current.scoreSnapshot = this.currentTeam!.score ?? 0
+      this.current.dartThrows = []
     },
 
     // Processus d'un lancer
-    processRound(dart: DartThrow): RoundResultX01 {
-      this.checkIfPlayerExist()
+    processRound(dart: DartThrow): ProcessRoundResultX01 {
+      // Round initialisé
+      if (this.current.dartThrows === undefined)
+        throw new Error('processRound: call initRound() first')
 
-      if (this.currentDartThrow >= 3) {
-        throw new Error(
-          'processRound: déjà trois fléchettes de lancées',
-        )
-      }
+      // Round terminé
+      if (this.current.dartThrows.length >= 3)
+        throw new Error('processRound: already 3 darts thrown')
 
-      // incrément du nombre de fléchette jouer
-      this.currentDartThrow++
+      // L'équipe courante existe
+      if (!this.currentTeam)
+        throw new Error('processRound: currentTeam not found')
 
+      // Ajout de la fléchette jouée
+      this.current.dartThrows.push(dart)
+
+      // Vérification de l'ouverture du jeu
       if (!this.checkIfPlayerCanPlay(dart)) {
         return {
-          validThrows: this.currentValidThrows,
+          needOpenning: true,
           bust: false,
           winner: false,
-          pointsToSubstract: 0,
         }
       }
-
-      const nextScore = this.currentScore! - dart.value
 
       // Vérification d'un bust
-      // * score négative
-      // * score à 1 alors que besoin d'un double
-      // * score à <25 alors que besoin d'une bull
-      // * score à <50 alors que besoin d'une double bull
-      if (
-        nextScore < 0 ||
-        (nextScore === 1 && this.options.doubleOut) ||
-        (nextScore < 25 && this.options.masterOut) ||
-        (nextScore < 50 &&
-          this.options.masterOut &&
-          this.options.doubleOut)
-      ) {
+      if (this.isBust(dart)) {
+        this.current.isBust = true
+
+        while (this.current.dartThrows.length < 3) {
+          this.current.dartThrows.push({
+            sector: 0,
+            multiplier: 1,
+            value: 0,
+          })
+        }
+
         return {
-          validThrows: this.currentValidThrows,
+          needOpenning: false,
           bust: true,
           winner: false,
-          pointsToSubstract: 0,
         }
       }
-
-      this.currentValidThrows.push(dart)
-      this.currentScore = nextScore
 
       // Vérification de la Victoire
-      // * score === 0
-      // * cf. Vérification Bust
-      if (nextScore === 0 && this.isValidClosingDart(dart)) {
+      if (this.currentScore === 0) {
+        while (this.current.dartThrows.length < 3) {
+          this.current.dartThrows.push({
+            sector: 0,
+            multiplier: 1,
+            value: 0,
+          })
+        }
+
         return {
-          validThrows: this.currentValidThrows,
+          needOpenning: false,
           bust: false,
           winner: true,
-          pointsToSubstract: this.currentScore - nextScore,
         }
       }
 
       return {
-        validThrows: this.currentValidThrows,
+        needOpenning: false,
         bust: false,
         winner: false,
-        pointsToSubstract: this.currentScore - nextScore,
-      }
-    },
-
-    // annuler le dernier le lancer
-    cancelThrow(): RoundResultX01 {
-      this.currentScore! +=
-        this.currentValidThrows[
-          this.currentDartThrow! - 1
-        ]!.value
-
-      this.currentDartThrow--
-      this.currentValidThrows.pop()
-
-      return {
-        validThrows: this.currentValidThrows,
-        bust: false,
-        winner: false,
-        pointsToSubstract: this.currentScore ?? 0,
-      }
-    },
-
-    // Check si l'index de joueur existe
-    checkIfPlayerExist() {
-      if (
-        !this.currentTeamIndex === undefined ||
-        !this.currentPlayerIndex === undefined ||
-        !this.currentScore === undefined ||
-        this.hasStarted[this.currentTeamIndex!]!.length <= 0
-      ) {
-        throw new Error('processRound: Team or Player not Setup')
       }
     },
 
     // Check si le joueur à réussi son démarrage
     checkIfPlayerCanPlay(dart: DartThrow): boolean {
       // Si le joueur peut déjà jouer
-      if (
-        this.hasStarted[this.currentTeamIndex!]![
-          this.currentPlayerIndex!
-        ]
-      ) {
+      if (this.hasStarted[this.currentTeam.id]!) {
         return true
       }
 
       // si ouverture valide
       if (this.isValidOpeningDart(dart)) {
-        this.hasStarted[this.currentTeamIndex!]![
-          this.currentPlayerIndex!
-        ] = true
+        this.hasStarted[this.currentTeam.id] = true
         return true
       }
 
@@ -210,21 +247,86 @@ export const useX01Store = defineStore('X01', {
     },
 
     // Vérification de si le lancer est valid pour la fermeture
-    isValidClosingDart(dart: DartThrow): boolean {
-      if (this.options.doubleOut && this.options.masterOut) {
-        return dart.sector === 50
-      } else if (this.options.masterOut) {
-        return dart.sector === 25 || dart.sector === 50
-      } else if (this.options.doubleOut) {
-        return dart.multiplier === 2 || dart.sector === 50
-      } else {
+    isBust(dart: DartThrow): boolean {
+      if (this.currentScore < 0) return true
+      if (
+        this.currentScore === 1 &&
+        (this.options.doubleOut || this.options.masterOut)
+      )
         return true
+
+      if (this.currentScore !== 0) return false // ← score normal, pas un bust
+
+      // currentScore === 0 : vérifier si le dart de fermeture est valide
+      if (this.options.doubleOut && this.options.masterOut) {
+        return dart.sector !== 50
+      } else if (this.options.doubleOut) {
+        return dart.multiplier !== 2 && dart.sector !== 50
+      } else if (this.options.masterOut) {
+        return (
+          dart.multiplier !== 2 &&
+          dart.multiplier !== 3 &&
+          dart.sector !== 25 &&
+          dart.sector !== 50
+        )
       }
+
+      return false
+    },
+
+    // annuler le dernier le lancer
+    cancelThrow(): ProcessRoundResultX01 {
+      if (this.current.dartThrows.length === 0)
+        throw new Error('cancelThrow: no throws to cancel')
+
+      if (this.currentScore === 0 || this.current.isBust) {
+        while (
+          this.current.dartThrows.length > 0 &&
+          this.current.dartThrows[
+            this.current.dartThrows.length - 1
+          ]!.sector === 0
+        ) {
+          this.current.dartThrows.pop()
+        }
+      }
+
+      if (this.current.isBust) {
+        this.current.isBust = false
+      }
+
+      this.current.dartThrows.pop()
+
+      return { bust: false, winner: false, needOpenning: false }
+    },
+
+    // finir le tour
+    endRound() {
+      if (this.current.isBust) {
+        // Rollback -> restore le score d'avant la volée
+        this.currentTeam.score = this.current.scoreSnapshot
+      } else {
+        // Appliquer le score final
+        this.currentTeam.score = this.currentScore
+      }
+
+      // Sauvegarder dans l'historique
+      this.gameHistory.unshift({
+        teamIndex: this.current.teamIndex,
+        playerIndex: this.current.playerIndex,
+        throws: [...this.current.dartThrows],
+        isBust: this.current.isBust,
+        isWinner: this.currentScore === 0,
+        score: this.currentTeam.score,
+      })
+
+      this.current.isBust = false
+      this.current.dartThrows = []
     },
 
     // reset du state
     reset() {
-      this.hasStarted = []
+      this.hasStarted = {}
+
       this.options = {
         startingPoints: X01_VARIANTS.X301,
         doubleIn: false,
@@ -232,16 +334,16 @@ export const useX01Store = defineStore('X01', {
         masterIn: false,
         masterOut: false,
       }
-      this.resetRound()
-    },
+      this.current = {
+        teamIndex: 0,
+        playerIndex: 0,
+        scoreSnapshot: 0,
+        dartThrows: [],
+        isBust: false,
+      }
 
-    // reset round
-    resetRound() {
-      this.currentTeamIndex = undefined
-      this.currentPlayerIndex = undefined
-      this.currentScore = undefined
-      this.currentDartThrow = 0
-      this.currentValidThrows = []
+      this.teams = []
+      this.gameHistory = []
     },
   },
 })

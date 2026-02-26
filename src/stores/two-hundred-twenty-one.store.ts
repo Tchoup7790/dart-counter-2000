@@ -77,6 +77,7 @@ export const use221Store = defineStore('221', {
 
       // incrément du nombre de fléchette jouer
       this.currentDartThrow++
+      this.currentValidThrows.push(dart)
 
       const nextScore = this.currentScore! + dart.value
 
@@ -95,8 +96,6 @@ export const use221Store = defineStore('221', {
           pointsToAdd: 0,
         }
       }
-
-      this.currentValidThrows.push(dart)
 
       // Vérification de la Victoire
       // * score === TARGET
@@ -141,7 +140,7 @@ export const use221Store = defineStore('221', {
     },
 
     // annuler le dernier le lancer
-    cancelThrow(): RoundResult221 {
+    cancelThrow(bust: boolean): RoundResult221 {
       // annuler la remise à 0
       this.allScores = this.allScores.map((value, index) => {
         if (index !== this.currentTeamIndex && value === 0) {
@@ -150,10 +149,12 @@ export const use221Store = defineStore('221', {
         return value ?? 0
       })
 
-      this.currentScore! -=
-        this.currentValidThrows[
-          this.currentDartThrow! - 1
-        ]!.value
+      if (!bust) {
+        this.currentScore! -=
+          this.currentValidThrows[
+            this.currentDartThrow! - 1
+          ]!.value
+      }
 
       this.currentDartThrow--
       this.currentValidThrows.pop()

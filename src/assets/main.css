@@ -55,8 +55,7 @@ body {
 
   display: flex;
   justify-content: center;
-  overflow-x: hidden;
-  overflow-y: scroll;
+  overflow: auto;
 
   background-color: var(--cs-base);
   /* Légère texture de bois/tapis */
@@ -93,7 +92,7 @@ main {
   width: 100%;
   flex-grow: 1;
   box-sizing: border-box;
-  padding: 8px 32px;
+  padding: 8px 12px;
 }
 
 /* Button */

@@ -1,18 +1,10 @@
 <template>
   <div class="game-controls">
-    <!-- Hint checkout X01 -->
-    <Transition name="hint">
-      <div class="checkout-hint" v-if="checkout">
-        <span class="hint-label">Checkout</span>
-        <span class="hint-value">{{ checkout }}</span>
-      </div>
-    </Transition>
-
     <div class="controls-row">
       <!-- Annuler -->
       <button
-        class="ctrl-btn ctrl-btn--undo"
-        :disabled="throwCount === 0"
+        class="ctrl-btn danger"
+        :disabled="props.currentThrows.length === 0"
         aria-label="Annuler le dernier lancer"
         @click="emit('undo')"
       >
@@ -20,29 +12,31 @@
         <span class="ctrl-label">Annuler</span>
       </button>
 
-      <!-- Compteur de fléchettes -->
-      <div class="throw-dots" aria-label="Fléchettes lancées">
-        <div
-          v-for="n in 3"
-          :key="n"
-          class="dot"
-          :class="{ 'dot--on': n <= throwCount }"
-          :style="
-            n <= throwCount
-              ? {
-                  background: activeColor,
-                  boxShadow: `0 0 7px ${activeColor}`,
-                }
-              : {}
-          "
-        />
+      <!-- Récapitulatif volée -->
+      <div class="throw-summary">
+        <span
+          v-for="(dart, i) in props.currentThrows"
+          :key="`throw-${i}`"
+          class="throw-badge"
+          :style="{
+            borderColor: props.activeTeamColor,
+            color: props.activeTeamColor,
+          }"
+          >{{ giveThrowLabel(dart) }}</span
+        >
+        <span
+          class="throw-badge throw-badge--empty"
+          v-for="n in 3 - props.currentThrows.length"
+          :key="`empty-${n}`"
+          >·</span
+        >
       </div>
 
       <!-- Valider -->
       <button
-        class="ctrl-btn ctrl-btn--validate"
-        :disabled="!canValidate"
+        class="ctrl-btn"
         aria-label="Valider la volée"
+        :disabled="props.currentThrows.length < 3"
         @click="emit('validate')"
       >
         <span class="ctrl-icon">✓</span>
@@ -53,71 +47,67 @@
 </template>
 
 <script setup lang="ts">
+import type { DartThrow } from '@/models/interfaces/dart-throw.interface'
+
 interface Props {
-  throwCount: number
-  activeColor: string
-  canValidate?: boolean
-  checkout?: string
+  activeTeamColor: string
+  currentThrows: Array<DartThrow>
 }
 
-withDefaults(defineProps<Props>(), {
-  canValidate: false,
+const props = withDefaults(defineProps<Props>(), {
+  activeTeamColor: 'var(--cs-green)',
+  currentThrows: () => [],
 })
 
 const emit = defineEmits<{
   (e: 'undo'): void
   (e: 'validate'): void
 }>()
+
+function giveThrowLabel(dart: DartThrow) {
+  const prefix =
+    dart.multiplier === 3
+      ? 'T'
+      : dart.multiplier === 2
+        ? 'D'
+        : ''
+  const label =
+    dart.sector === 50 || dart.sector === 25
+      ? 'Bull'
+      : String(dart.sector)
+  return `${prefix}${label}`
+}
 </script>
 
 <style scoped>
 .game-controls {
   display: flex;
   flex-direction: column;
-  padding: 0 20px 14px;
+  padding: 24px 12px 14px;
 }
 
-/* Checkout hint */
-.checkout-hint {
+.throw-summary {
   display: flex;
+  gap: 12px;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 7px 14px;
-  background: color-mix(
-    in srgb,
-    var(--cs-green) 8%,
-    var(--cs-surface)
-  );
-  border: 1px solid
-    color-mix(in srgb, var(--cs-green) 22%, transparent);
-  border-radius: 8px;
 }
 
-.hint-label {
-  font-size: 9px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--cs-muted);
-}
-
-.hint-value {
+.throw-badge {
+  padding: 6px 10px;
+  border: 1px solid;
+  border-radius: 6px;
+  font-family: inherit;
   font-size: 13px;
   font-weight: 700;
-  color: var(--cs-green);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
+  min-width: 36px;
+  text-align: center;
 }
 
-.hint-enter-active,
-.hint-leave-active {
-  transition:
-    opacity 0.25s,
-    transform 0.25s;
-}
-.hint-enter-from,
-.hint-leave-to {
-  opacity: 0;
-  transform: translateY(-4px);
+.throw-badge--empty {
+  border-color: var(--cs-muted);
+  color: var(--cs-muted);
+  opacity: 0.35;
 }
 
 /* Ligne principale */
@@ -207,30 +197,5 @@ const emit = defineEmits<{
   font-size: 9px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-}
-
-/* Dots */
-.throw-dots {
-  display: flex;
-  gap: 9px;
-  align-items: center;
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--cs-overlay);
-  border: 1px solid
-    color-mix(in srgb, var(--cs-muted) 25%, transparent);
-  transition:
-    background 0.2s,
-    box-shadow 0.2s,
-    transform 0.2s;
-}
-
-.dot--on {
-  transform: scale(1.2);
-  border-color: transparent;
 }
 </style>

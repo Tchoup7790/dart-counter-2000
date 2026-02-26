@@ -29,8 +29,6 @@ export interface GameState {
   activeTeamIndex: number
   activePlayerIndex: number
   roundNumber: number
-
-  currentThrows: DartThrow[]
 }
 
 export const useGameStore = defineStore('game', {
@@ -47,8 +45,6 @@ export const useGameStore = defineStore('game', {
       activeTeamIndex: 0,
       activePlayerIndex: 0,
       roundNumber: 1,
-
-      currentThrows: [],
     }) as GameState,
 
   getters: {
@@ -72,7 +68,7 @@ export const useGameStore = defineStore('game', {
     teamHistory: (state) => {
       return (teamIndex: number): Round[] => {
         return state.gameHistory.filter(
-          (r) => r.team === teamIndex,
+          (r) => r.teamIndex === teamIndex,
         )
       }
     },
@@ -96,28 +92,20 @@ export const useGameStore = defineStore('game', {
       this.activeTeamIndex = 0
       this.activePlayerIndex = 0
       this.roundNumber = 1
-      this.currentThrows = []
       this.status = STATUS.PLAYING
-    },
-
-    registerThrow(dart: DartThrow): boolean {
-      if (this.currentThrows.length >= 3) return false
-
-      this.currentThrows.push(dart)
-      return true
-    },
-
-    undoLastThrow(): DartThrow | undefined {
-      return this.currentThrows.pop()
     },
 
     commitRound(throws: DartThrow[]) {
       const round: Round = {
-        team: this.activeTeamIndex,
+        teamIndex: this.activeTeamIndex,
+        playerIndex: 0,
+        isBust: false,
+        isWinner: false,
+        score: 0,
+
         throws,
       }
       this.gameHistory.push(round)
-      this.currentThrows = []
 
       // Check if winner
       if (this.teamWinner !== undefined) {
@@ -142,31 +130,29 @@ export const useGameStore = defineStore('game', {
 
     resetPlayerPoints() {
       this.teams.forEach((team: Team) => {
-        team.points = 0
+        team.score = 0
       })
     },
 
     subtractPoints(teamIndex: number, amount: number) {
-      this.teams[teamIndex]!.points -= amount
+      this.teams[teamIndex]!.score -= amount
     },
 
     addPoints(teamIndex: number, amount: number) {
-      this.teams[teamIndex]!.points += amount
+      this.teams[teamIndex]!.score += amount
     },
 
-    restorePoints(teamIndex: number, value: number) {
-      this.teams[teamIndex]!.points = value
+    setPoints(teamIndex: number, value: number) {
+      this.teams[teamIndex]!.score = value
     },
 
     reset() {
       this.gameMode = undefined
-      this.teams = []
       this.gameHistory = []
       this.teamWinner = undefined
       this.activeTeamIndex = 0
       this.activePlayerIndex = 0
       this.roundNumber = 1
-      this.currentThrows = []
       this.status = STATUS.SETUP
     },
   },

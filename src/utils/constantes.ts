@@ -8,15 +8,23 @@ export const BOARD_SECTORS = [
   12, 5,
 ]
 
+export const BOARD_GRID = [
+  [1, 2, 3, 4],
+  [5, 6, 7, 8],
+  [9, 10, 11, 12],
+  [13, 14, 15, 16],
+  [17, 18, 19, 20],
+]
+
 // Palettes
 export const TEAM_COLORS = [
-  'var(--cs-green)',
-  'var(--cs-red)',
   'var(--cs-yellow)',
   'var(--cs-cyan)',
   'var(--cs-violet)',
   'var(--cs-rose)',
   'var(--cs-orange)',
+  'var(--cs-green)',
+  'var(--cs-red)',
   'var(--cs-blue)',
   'var(--cs-pink)',
   'var(--cs-lime)',
@@ -25,13 +33,13 @@ export const TEAM_COLORS = [
 ]
 
 export const PLAYER_COLORS = [
-  'var(--cs-green)',
-  'var(--cs-red)',
   'var(--cs-yellow)',
   'var(--cs-cyan)',
   'var(--cs-violet)',
   'var(--cs-rose)',
   'var(--cs-orange)',
+  'var(--cs-green)',
+  'var(--cs-red)',
   'var(--cs-blue)',
   'var(--cs-pink)',
   'var(--cs-lime)',
@@ -50,14 +58,14 @@ export const DEFAULT_TEAM_PLAYERS = [
     id: getId(),
     name: 'Équipe 1',
     color: TEAM_COLORS[0]!,
-    points: 0,
+    score: 0,
     players: [{ id: getId(), name: 'Joueur 1' }],
   },
   {
     id: getId(),
     name: 'Équipe 2',
     color: TEAM_COLORS[1]!,
-    points: 0,
+    score: 0,
     players: [{ id: getId(), name: 'Joueur 1' }],
   },
 ]

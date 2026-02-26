@@ -9,9 +9,16 @@ export interface X01Options {
   masterOut: boolean
 }
 
-export interface RoundResultX01 {
-  validThrows: DartThrow[]
+export interface CurrentRoundX01 {
+  teamIndex: number
+  playerIndex: number
+  scoreSnapshot: number
+  dartThrows: DartThrow[]
+  isBust: boolean
+}
+
+export interface ProcessRoundResultX01 {
+  needOpenning: boolean
   bust: boolean
   winner: boolean
-  pointsToSubstract: number
 }
