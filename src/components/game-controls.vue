@@ -100,7 +100,6 @@ function giveThrowLabel(dart: DartThrow) {
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  min-width: 36px;
   text-align: center;
 }
 
@@ -115,7 +114,7 @@ function giveThrowLabel(dart: DartThrow) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  padding: 12px;
 }
 
 /* Boutons */
@@ -124,7 +123,6 @@ function giveThrowLabel(dart: DartThrow) {
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  min-width: 82px;
   padding: 10px 20px;
   border-radius: var(--radius);
   cursor: pointer;
