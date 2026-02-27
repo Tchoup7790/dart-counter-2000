@@ -178,7 +178,7 @@ function select(mode: GameMode) {
     var(--accent) 6%,
     var(--cs-surface)
   );
-  border: 1px solid
+  border: 1.5px solid
     color-mix(in srgb, var(--accent) 18%, transparent);
   border-radius: var(--radius);
   cursor: pointer;
@@ -210,6 +210,13 @@ function select(mode: GameMode) {
 }
 .mode-card:active {
   transform: translateX(1px) scale(0.99);
+}
+
+.mode-card:disabled,
+.mode-card.mode-card:disabled > * {
+  opacity: 0.28;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .mode-icon {

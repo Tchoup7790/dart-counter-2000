@@ -220,7 +220,7 @@ input {
     var(--color-primary) 6%,
     var(--cs-surface)
   );
-  border: 1px solid
+  border: 15px solid
     color-mix(in srgb, var(--color-primary) 20%, transparent);
   border-radius: var(--radius);
 
@@ -248,24 +248,6 @@ input:hover {
   );
 }
 
-input:focus {
-  border-color: color-mix(
-    in srgb,
-    var(--color-primary) 65%,
-    transparent
-  );
-  background: color-mix(
-    in srgb,
-    var(--color-primary) 10%,
-    var(--cs-surface)
-  );
-  box-shadow:
-    0 0 0 3px
-      color-mix(in srgb, var(--color-primary) 12%, transparent),
-    0 0 16px
-      color-mix(in srgb, var(--color-primary) 10%, transparent);
-}
-
 /* Input invalide / bust */
 input.error,
 input:invalid {
@@ -284,38 +266,4 @@ input.error:focus,
 input:invalid:focus {
   box-shadow: 0 0 0 3px
     color-mix(in srgb, var(--cs-red) 15%, transparent);
-}
-
-/* Select */
-select {
-  padding: 10px 14px;
-  font-size: 14px;
-  font-family: inherit;
-  color: var(--cs-text);
-
-  background: color-mix(
-    in srgb,
-    var(--color-primary) 6%,
-    var(--cs-surface)
-  );
-  border: 1px solid
-    color-mix(in srgb, var(--color-primary) 20%, transparent);
-  border-radius: var(--radius);
-  outline: none;
-  cursor: pointer;
-
-  transition:
-    border-color var(--transition),
-    background var(--transition);
-  appearance: none;
-}
-
-select:focus {
-  border-color: color-mix(
-    in srgb,
-    var(--color-primary) 60%,
-    transparent
-  );
-  box-shadow: 0 0 0 3px
-    color-mix(in srgb, var(--color-primary) 12%, transparent);
 }

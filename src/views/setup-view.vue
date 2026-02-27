@@ -13,15 +13,27 @@
     <div class="setup-content">
       <h2 class="setup-title">Configuration</h2>
 
-      <!-- Toggle équipe / solo -->
-      <section class="section">
-        <OptionToggle
-          :model-value="state.teamMode"
-          label="Mode équipe"
-          description="Regrouper les joueurs en équipes"
-          @update:model-value="state.teamMode = $event"
-        />
-      </section>
+      <div class="global-option">
+        <!-- Toggle équipe / solo -->
+        <section class="section">
+          <OptionToggle
+            :model-value="state.teamMode"
+            label="Mode équipe"
+            description="Regrouper les joueurs en équipes"
+            @update:model-value="state.teamMode = $event"
+          />
+        </section>
+
+        <!-- Toggle Ordre aléatoires -->
+        <section class="section">
+          <OptionToggle
+            :model-value="state.randomOrder"
+            label="Mode aléatoire"
+            description="Mettre l'ordre des joueurs en aléatoire "
+            @update:model-value="state.randomOrder = $event"
+          />
+        </section>
+      </div>
 
       <!-- MODE SOLO -->
       <section class="section" v-if="!state.teamMode">
@@ -251,7 +263,6 @@
     <div class="setup-cta">
       <button
         class="btn-start"
-        :class="{ 'btn-start--ready': canStart }"
         :style="canStart ? { '--ac': accentColor } : {}"
         :disabled="!canStart"
         @click="startGame"
@@ -292,7 +303,7 @@ import { X01_VARIANTS } from '@/models/enums/x01-variants.enum'
 import { useRoute, useRouter } from 'vue-router'
 import OptionToggle from '@/components/option-toggle.vue'
 import ChipSelector from '@/components/chip-selector.vue'
-import { getId } from '@/utils/functions'
+import { getId, shuffle } from '@/utils/functions'
 
 const route = useRoute()
 const router = useRouter()
@@ -305,6 +316,7 @@ const atcStore = useAtcStore()
 interface SetupViewState {
   visible: boolean
   teamMode: boolean
+  randomOrder: boolean
   soloPlayers: SoloPlayer[]
   teams: Team[]
   x01Options: X01Options
@@ -317,6 +329,7 @@ interface SetupViewState {
 const state: SetupViewState = reactive({
   visible: false,
   teamMode: false,
+  randomOrder: true,
   soloPlayers: DEFAULT_SOLO_PLAYERS,
   teams: DEFAULT_TEAM_PLAYERS,
   x01Options: {
@@ -423,19 +436,11 @@ function removePlayerFromTeam(ti: number, pi: number) {
 // Validation
 const canStart = computed(() => {
   if (!state.teamMode) {
-    return (
-      state.soloPlayers.length >= 1 &&
-      state.soloPlayers.every((p) => p.name.trim().length > 0)
-    )
+    return state.soloPlayers.length >= 1
   }
   return (
     state.teams.length >= 1 &&
-    state.teams.every(
-      (t) =>
-        t.name.trim().length > 0 &&
-        t.players.length >= 1 &&
-        t.players.every((p) => p.name.trim().length > 0),
-    )
+    state.teams.every((t) => t.players.length >= 1)
   )
 })
 
@@ -447,33 +452,39 @@ function startGame() {
 
   if (!state.teamMode) {
     // Chaque joueur = une Team, couleur sur le joueur
-    builtTeams = state.soloPlayers.map((p) => ({
-      id: p.id,
-      name: p.name,
-      color: p.color,
-      score: 0,
-      players: [
-        {
-          id: p.id,
-          name: p.name,
-        } as Player,
-      ],
-    }))
-  } else {
-    // Équipes, couleur sur l'équipe, joueurs sans couleur
-    builtTeams = state.teams.map((t) => ({
-      id: t.id,
-      name: t.name,
-      color: t.color,
-      score: 0,
-      players: t.players.map(
-        (p) =>
-          ({
+    builtTeams = state.soloPlayers
+      .filter((p) => p.name.trim() !== '')
+      .map((p) => ({
+        id: p.id,
+        name: p.name,
+        color: p.color,
+        score: 0,
+        players: [
+          {
             id: p.id,
             name: p.name,
-          }) as Player,
-      ),
-    }))
+          } as Player,
+        ],
+      }))
+  } else {
+    // Équipes, couleur sur l'équipe, joueurs sans couleur
+    builtTeams = state.teams
+      .filter((t) => t.name.trim() !== '')
+      .map((t) => ({
+        id: t.id,
+        name: t.name,
+        color: t.color,
+        score: 0,
+        players: t.players
+          .filter((p) => p.name.trim() !== '')
+          .map(
+            (p) =>
+              ({
+                id: p.id,
+                name: p.name,
+              }) as Player,
+          ),
+      }))
   }
 
   let activeOptions:
@@ -495,6 +506,13 @@ function startGame() {
     case GameMode.ATC:
       activeOptions = state.atcOptions
       break
+  }
+
+  if (state.randomOrder) {
+    builtTeams = shuffle(builtTeams) as Team[]
+    builtTeams.forEach((t) => {
+      t.players = shuffle(t.players) as Player[]
+    })
   }
 
   game.initGame({
@@ -551,6 +569,7 @@ function goBack() {
   min-height: 100vh;
   opacity: 0;
   transition: opacity 0.35s ease;
+  padding-bottom: 24px;
 }
 .setup.visible {
   opacity: 1;
@@ -608,6 +627,12 @@ function goBack() {
   color: var(--cs-text);
 }
 
+.global-option {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .section {
   display: flex;
   flex-direction: column;
@@ -626,29 +651,9 @@ function goBack() {
   text-transform: uppercase;
   color: var(--cs-muted);
 }
-
 .btn-add-entity {
   font-size: 11px;
-  padding: 5px 12px;
-  font-family: inherit;
-  background: color-mix(
-    in srgb,
-    var(--cs-green) 12%,
-    transparent
-  );
-  color: var(--cs-green);
-  border: 1px solid
-    color-mix(in srgb, var(--cs-green) 30%, transparent);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background var(--transition);
-}
-.btn-add-entity:hover {
-  background: color-mix(
-    in srgb,
-    var(--cs-green) 22%,
-    transparent
-  );
+  font-weight: 700;
 }
 .btn-add-entity:disabled {
   opacity: 0.3;
@@ -704,7 +709,7 @@ function goBack() {
     var(--tc) 6%,
     var(--cs-surface)
   );
-  border: 1px solid
+  border: 1.5px solid
     color-mix(in srgb, var(--tc) 18%, transparent);
   border-radius: var(--radius);
 }
@@ -729,7 +734,7 @@ function goBack() {
     var(--tc) 5%,
     var(--cs-surface)
   );
-  border: 1px solid
+  border: 1.5px solid
     color-mix(in srgb, var(--tc) 20%, transparent);
   border-radius: var(--radius);
   overflow: hidden;
@@ -757,7 +762,7 @@ function goBack() {
   flex-shrink: 0;
   background: color-mix(in srgb, var(--tc) 12%, transparent);
   color: var(--tc);
-  border: 1px solid
+  border: 1.5px solid
     color-mix(in srgb, var(--tc) 25%, transparent);
   border-radius: 5px;
   cursor: pointer;
@@ -781,7 +786,7 @@ function goBack() {
   align-items: center;
   gap: 8px;
   padding: 7px 12px;
-  border-bottom: 1px solid
+  border-bottom: 1.5px solid
     color-mix(in srgb, var(--cs-muted) 10%, transparent);
 }
 .player-row:last-child {
@@ -799,14 +804,10 @@ function goBack() {
   flex: 1;
   min-width: 0;
   background: transparent;
-  border: none;
-  border: 2px solid transparent;
+  border: 1px solid transparent;
   padding: 4px 6px;
-  font-size: 13px;
-  font-family: inherit;
   color: var(--cs-text);
   outline: none;
-  transition: border-color var(--transition);
 }
 .field:focus {
   border-color: var(--tc, var(--cs-green));
@@ -824,53 +825,18 @@ function goBack() {
 .toggle-list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
 }
 
 /* CTA */
 .setup-cta {
-  padding: 16px 20px 36px;
+  padding: 16px 20px 16px;
 }
 .btn-start {
   width: 100%;
-  padding: 16px;
-  font-size: 16px;
-  font-family: inherit;
   font-weight: 700;
   letter-spacing: 0.08em;
-  border-radius: var(--radius);
-  cursor: not-allowed;
   transition: all 0.35s ease;
-  background: color-mix(
-    in srgb,
-    var(--cs-muted) 6%,
-    var(--cs-surface)
-  );
-  color: var(--cs-muted);
-  border: 1px solid
-    color-mix(in srgb, var(--cs-muted) 20%, transparent);
-}
-.btn-start--ready {
-  background: color-mix(
-    in srgb,
-    var(--ac) 18%,
-    var(--cs-surface)
-  );
-  color: var(--ac);
-  border-color: color-mix(in srgb, var(--ac) 45%, transparent);
-  cursor: pointer;
-  box-shadow: 0 0 24px
-    color-mix(in srgb, var(--ac) 15%, transparent);
-}
-.btn-start--ready:hover {
-  background: color-mix(
-    in srgb,
-    var(--ac) 28%,
-    var(--cs-surface)
-  );
-}
-.btn-start--ready:active {
-  transform: scale(0.98);
 }
 
 /* Transitions */
