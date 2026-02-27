@@ -21,7 +21,6 @@ export interface GameState {
   teams: Team[]
   gameHistory: Round[]
   teamWinner: number | undefined
-  roundNumber: number
 }
 
 export const useGameStore = defineStore('game', {
@@ -34,9 +33,19 @@ export const useGameStore = defineStore('game', {
       teams: [],
       gameHistory: [],
       teamWinner: undefined,
-
-      roundNumber: 1,
     }) as GameState,
+
+  persist: {
+    key: 'game-store',
+    pick: [
+      'gameMode',
+      'options',
+      'status',
+      'teams',
+      'gameHistory',
+      'teamWinner',
+    ],
+  },
 
   getters: {
     isPlaying(): boolean {
@@ -69,13 +78,11 @@ export const useGameStore = defineStore('game', {
       this.teams = payload.teams
       this.gameHistory = []
       this.teamWinner = undefined
-      this.roundNumber = 1
       this.status = STATUS.PLAYING
     },
 
     commitRound(round: Round) {
       this.gameHistory.unshift(round)
-      this.roundNumber++
     },
 
     setWinner(teamIndex: number) {
@@ -96,7 +103,6 @@ export const useGameStore = defineStore('game', {
       this.gameMode = undefined
       this.gameHistory = []
       this.teamWinner = undefined
-      this.roundNumber = 1
       this.status = STATUS.SETUP
       this.options = undefined
     },
@@ -104,7 +110,6 @@ export const useGameStore = defineStore('game', {
     restart() {
       this.gameHistory = []
       this.teamWinner = undefined
-      this.roundNumber = 1
       this.status = STATUS.SETUP
     },
   },

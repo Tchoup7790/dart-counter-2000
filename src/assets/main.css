@@ -70,6 +70,9 @@ body {
       color-mix(in srgb, var(--cs-red) 5%, transparent) 0%,
       transparent 50%
     );
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* App div */

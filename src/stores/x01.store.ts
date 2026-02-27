@@ -37,6 +37,18 @@ export const useX01Store = defineStore('X01', {
       teams: [],
     }) as X01State,
 
+  persist: {
+    key: 'x01-store',
+    pick: [
+      'options',
+      'current.teamIndex',
+      'current.playerIndex',
+      'current.scoreSnapshot',
+      'hasStarted',
+      'teams',
+    ],
+  },
+
   getters: {
     // Renvoie l'index de la dernière équipe
     lastTeamIndex(): number {

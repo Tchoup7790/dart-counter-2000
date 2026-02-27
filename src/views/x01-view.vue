@@ -191,13 +191,6 @@ function scrollToStart() {
   padding: 24px 12px;
   overflow-y: visible;
   overflow-x: scroll;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-.scores-area::-webkit-scrollbar {
-  display: none;
 }
 
 .score-cards {
