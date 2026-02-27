@@ -98,7 +98,7 @@ const state: GameBarLayout = reactive({
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  overflow-y: scroll;
+  overflow-y: visible;
 }
 
 /* Barre */

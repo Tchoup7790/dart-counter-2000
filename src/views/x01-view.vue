@@ -20,7 +20,7 @@
   >
     <div class="view" :class="{ visible: state.visible }">
       <!-- ScoreCards -->
-      <section class="scores-area">
+      <section class="scores-area" ref="scrollContainer">
         <div class="score-cards">
           <ScoreCard
             v-for="{ team, index } in sortedTeams"
@@ -70,7 +70,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch, reactive, computed } from 'vue'
+import { onMounted, watch, reactive, computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useX01Store } from '@/stores/x01.store'
 import type { DartThrow } from '@/models/interfaces/dart-throw.interface'
@@ -116,6 +116,7 @@ function onRoundComplete() {
     game.status = STATUS.FINISHED
   if (!game.isFinished)
     x01Store.initRound(game.roundNumber, game.gameHistory.length)
+  scrollToStart()
 }
 
 // Quit
@@ -157,6 +158,16 @@ watch(
       setTimeout(() => router.push({ name: 'winner' }), 600)
   },
 )
+
+const scrollContainer = ref<HTMLDivElement | null>(null)
+
+// scroll pour voir l'équipe active
+function scrollToStart() {
+  scrollContainer.value?.scrollTo({
+    left: 0,
+    behavior: 'smooth',
+  })
+}
 </script>
 
 <style scoped>
@@ -164,19 +175,29 @@ watch(
   display: flex;
   width: 100%;
   flex-direction: column;
-  min-height: calc(100vh - 53px);
+  gap: auto;
+  min-height: calc(97vh - 53px);
   opacity: 0;
   transition: opacity 0.35s ease;
-  overflow: hidden;
+  overflow-x: visible;
+  overflow-y: visible;
 }
+
 .view.visible {
   opacity: 1;
 }
 
 .scores-area {
-  padding: 8px 12px 12px;
-  overflow-x: auto;
+  padding: 24px 12px;
+  overflow-y: visible;
+  overflow-x: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   -webkit-overflow-scrolling: touch;
+}
+
+.scores-area::-webkit-scrollbar {
+  display: none;
 }
 
 .score-cards {
