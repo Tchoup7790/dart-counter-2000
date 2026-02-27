@@ -14,6 +14,7 @@ export interface X01State {
   current: CurrentRoundX01
   hasStarted: Record<string, boolean>
   teams: Team[]
+  roundInProgress: boolean
 }
 
 export const useX01Store = defineStore('X01', {
@@ -35,6 +36,7 @@ export const useX01Store = defineStore('X01', {
       },
       hasStarted: {},
       teams: [],
+      roundInProgress: false,
     }) as X01State,
 
   persist: {
@@ -43,9 +45,9 @@ export const useX01Store = defineStore('X01', {
       'options',
       'current.teamIndex',
       'current.playerIndex',
-      'current.scoreSnapshot',
       'hasStarted',
       'teams',
+      'roundInProgress',
     ],
   },
 
@@ -151,6 +153,7 @@ export const useX01Store = defineStore('X01', {
 
       this.current.scoreSnapshot = this.currentTeam!.score ?? 0
       this.current.dartThrows = []
+      this.roundInProgress = true
     },
 
     // Processus d'un lancer
@@ -324,8 +327,15 @@ export const useX01Store = defineStore('X01', {
 
       this.current.isBust = false
       this.current.dartThrows = []
+      this.roundInProgress = false
 
       return result
+    },
+
+    restoreRound() {
+      this.current.dartThrows = []
+      this.current.isBust = false
+      this.current.scoreSnapshot = this.currentTeam.score ?? 0
     },
 
     // reset du state

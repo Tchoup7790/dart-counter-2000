@@ -95,7 +95,11 @@ const state: X01State = reactive({
 })
 
 onMounted(() => {
-  x01Store.initRound(game.roundNumber, game.gameHistory.length)
+  if (x01Store.roundInProgress) {
+    x01Store.restoreRound()
+  } else {
+    x01Store.initRound(game.roundNumber, game.gameHistory.length)
+  }
   setTimeout(() => (state.visible = true), 50)
 })
 

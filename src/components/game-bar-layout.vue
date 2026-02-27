@@ -57,10 +57,7 @@
             >
               ▶ Reprendre
             </button>
-            <button
-              class="menu-item danger"
-              @click="emit('quit')"
-            >
+            <button class="menu-item danger" @click="quitGame">
               🚪 Quitter
             </button>
           </div>
@@ -71,6 +68,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game.store'
 import { reactive } from 'vue'
 
 const props = defineProps<{
@@ -83,6 +81,13 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'quit'): void
 }>()
+
+const game = useGameStore()
+
+function quitGame() {
+  game.reset()
+  emit('quit')
+}
 
 interface GameBarLayout {
   showMenu: boolean
