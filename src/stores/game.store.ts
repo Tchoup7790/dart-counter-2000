@@ -98,6 +98,14 @@ export const useGameStore = defineStore('game', {
       this.teamWinner = undefined
       this.roundNumber = 1
       this.status = STATUS.SETUP
+      this.options = undefined
+    },
+
+    restart() {
+      this.gameHistory = []
+      this.teamWinner = undefined
+      this.roundNumber = 1
+      this.status = STATUS.SETUP
     },
   },
 })

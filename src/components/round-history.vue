@@ -3,12 +3,12 @@
     <p class="rh-title">Historique</p>
     <div class="rh-list">
       <div
-        v-for="round in x01Store.gameHistory"
+        v-for="round in game.gameHistory"
         :key="`${round.teamIndex}`"
         class="rh-row"
         :style="{
           '--tc':
-            x01Store.teamColors[round.teamIndex] ??
+            game.teams[round.teamIndex]?.color ??
             'var(--cs-muted)',
         }"
       >
@@ -16,7 +16,7 @@
 
         <span class="rh-name">
           {{
-            x01Store.teams[round.teamIndex]!.players[
+            game.teams[round.teamIndex]!.players[
               round.playerIndex
             ]!.name
           }}
@@ -45,9 +45,9 @@
 
 <script setup lang="ts">
 import type { DartThrow } from '@/models/interfaces/dart-throw.interface'
-import { useX01Store } from '@/stores/x01.store'
+import { useGameStore } from '@/stores/game.store'
 
-const x01Store = useX01Store()
+const game = useGameStore()
 
 function label(t: DartThrow): string {
   if (t.sector === 50) return 'Bull'
@@ -62,6 +62,7 @@ function label(t: DartThrow): string {
 .round-history {
   display: flex;
   flex-direction: column;
+  overflow-y: scroll;
   gap: 5px;
   padding: 24px 0;
   width: 100%;

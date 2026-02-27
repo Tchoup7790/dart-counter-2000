@@ -78,7 +78,12 @@
       </div>
 
       <!-- Bouton -->
-      <button class="btn-home" @click="goHome">← Accueil</button>
+      <div class="btn-sector">
+        <button class="btn" @click="goHome">🏠 Accueil</button>
+        <button class="btn danger" @click="restart()">
+          🔄 Recommencer
+        </button>
+      </div>
 
       <!-- Séparateur -->
       <div class="divider" />
@@ -100,8 +105,7 @@ const router = useRouter()
 const visible = ref(false)
 onMounted(() => setTimeout(() => (visible.value = true), 50))
 
-// ─── Gagnant ─────────────────────────────────────────────────────────────────
-
+// Gagnant
 const winnerIndex = computed(() => game.teamWinner ?? 0)
 
 const winnerName = computed(
@@ -113,8 +117,7 @@ const winnerColor = computed(() => {
   return t?.color ?? t?.color ?? 'var(--cs-green)'
 })
 
-// ─── Classement ──────────────────────────────────────────────────────────────
-
+// Classement
 const rankings = computed(() =>
   game.teams
     .map((t, i) => ({
@@ -127,7 +130,7 @@ const rankings = computed(() =>
     .sort((a, b) => (b.isWinner ? 1 : 0) - (a.isWinner ? 1 : 0)),
 )
 
-// ─── Confettis ────────────────────────────────────────────────────────────────
+// Confettis
 
 const COLORS = [
   '#2ecc71',
@@ -154,20 +157,24 @@ function goHome() {
   game.reset()
   router.push({ name: 'home' })
 }
+function restart() {
+  game.restart()
+  router.push({ name: 'setup' })
+}
 </script>
 
 <style scoped>
 .winner-view {
-  min-height: 100vh;
+  min-height: 97vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  overflow-x: hidden;
-  overflow-y: scroll;
+  justify-content: start;
+  overflow: hidden;
   position: relative;
   opacity: 0;
   transition: opacity 0.4s ease;
+  padding: 142px 48px 0;
 }
 .winner-view.visible {
   opacity: 1;
@@ -178,7 +185,7 @@ function goHome() {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 0;
+  z-index: 10;
 }
 .confetto {
   position: absolute;
@@ -201,10 +208,7 @@ function goHome() {
 /* Contenu */
 .content {
   position: relative;
-  z-index: 1;
   width: 100%;
-  max-width: 420px;
-  padding: 40px 20px 56px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -321,14 +325,17 @@ function goHome() {
 }
 
 /* Bouton */
-.btn-home {
+.btn-sector {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 12px;
+}
+.btn {
   width: 100%;
   padding: 15px;
-  margin: 24px 0;
   font-size: 15px;
   font-family: inherit;
   font-weight: 700;
-  border-color: var(--cs-subtle);
-  background-color: var(--cs-surface);
 }
 </style>
