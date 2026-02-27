@@ -15,7 +15,7 @@
       x01Store.currentTeam.color ?? 'var(--cs-green)'
     "
     :mode-name="GameMode.X01"
-    :round-number="x01Store.roundNumber"
+    :round-number="game.roundNumber"
     @quit="quitGame"
   >
     <div class="view" :class="{ visible: state.visible }">
@@ -23,7 +23,7 @@
       <section class="scores-area">
         <div class="score-cards">
           <ScoreCard
-            v-for="(team, index) in x01Store.teams"
+            v-for="{ team, index } in sortedTeams"
             class="score-card"
             :key="index"
             :name="
@@ -95,7 +95,7 @@ const state: X01State = reactive({
 })
 
 onMounted(() => {
-  x01Store.initRound()
+  x01Store.initRound(game.roundNumber, game.gameHistory.length)
   setTimeout(() => (state.visible = true), 50)
 })
 
@@ -107,11 +107,15 @@ function onDartThrown(dart: DartThrow) {
 
 // Round complete
 function onRoundComplete() {
-  x01Store.endRound()
+  const roundResult = x01Store.endRound()
+
+  // D'abord commit dans le gameStore pour mettre à jour gameHistory et roundNumber
+  game.commitRound(roundResult)
 
   if (game.teamWinner !== undefined)
     game.status = STATUS.FINISHED
-  if (!game.isFinished) x01Store.initRound()
+  if (!game.isFinished)
+    x01Store.initRound(game.roundNumber, game.gameHistory.length)
 }
 
 // Quit
@@ -121,12 +125,28 @@ function quitGame() {
   router.push({ name: 'home' })
 }
 
-// TODO:Pour changer l'affichage
 const sortedTeams = computed(() => {
-  const others = x01Store.teams.filter(
-    (t) => t.id !== x01Store.currentTeam.id,
-  )
-  return [x01Store.currentTeam, ...others]
+  if (x01Store.teams.length > 3) {
+    return x01Store.teams
+      .map((team, index) => ({ team, index }))
+      .sort((a, b) => {
+        // L'équipe active toujours en premier
+        if (a.team.id === x01Store.currentTeam.id) return -1
+        if (b.team.id === x01Store.currentTeam.id) return 1
+
+        // Les autres dans l'ordre naturel par rapport à l'actif
+        const activeIndex = x01Store.current.teamIndex
+        const aNorm =
+          (a.index - activeIndex + x01Store.teams.length) %
+          x01Store.teams.length
+        const bNorm =
+          (b.index - activeIndex + x01Store.teams.length) %
+          x01Store.teams.length
+        return aNorm - bNorm
+      })
+  } else {
+    return x01Store.teams.map((team, index) => ({ team, index }))
+  }
 })
 
 // Victoire

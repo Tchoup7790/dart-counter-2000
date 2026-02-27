@@ -37,6 +37,9 @@ const router = createRouter({
     { path: '/winner', name: 'winner', component: WinnerView },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
+  scrollBehavior(_to, _from, _savedPosition) {
+    return { top: 0 }
+  },
 })
 
 export default router

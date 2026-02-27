@@ -14,7 +14,6 @@ export interface X01State {
   current: CurrentRoundX01
   hasStarted: Record<string, boolean>
   teams: Team[]
-  gameHistory: Round[]
 }
 
 export const useX01Store = defineStore('X01', {
@@ -36,7 +35,6 @@ export const useX01Store = defineStore('X01', {
       },
       hasStarted: {},
       teams: [],
-      gameHistory: [],
     }) as X01State,
 
   getters: {
@@ -70,13 +68,6 @@ export const useX01Store = defineStore('X01', {
     // Renvoie les noms des équipes
     teamNames(): string[] {
       return this.teams.map((team) => team.name)
-    },
-    // Donnes le nombre de round joué
-    roundNumber(): number {
-      return (
-        Math.floor(this.gameHistory.length / this.teams.length) +
-        1
-      )
     },
   },
 
@@ -112,7 +103,7 @@ export const useX01Store = defineStore('X01', {
     },
 
     // Initialisation d'un Round
-    initRound() {
+    initRound(roundNumber: number, gameHistory: number) {
       // Le store a bien été initialisé
       if (this.teams.length < 1)
         throw new Error('initRound: call init() first')
@@ -128,7 +119,7 @@ export const useX01Store = defineStore('X01', {
           'initRound: player not found in current team',
         )
 
-      if (this.gameHistory.length !== 0) {
+      if (gameHistory !== 0) {
         // Passage à l'équipe suivante
         if (this.current.teamIndex >= this.lastTeamIndex) {
           // On revient à la première équipe
@@ -140,7 +131,7 @@ export const useX01Store = defineStore('X01', {
 
         // Le joueur dépend du round
         this.current.playerIndex =
-          this.roundNumber % this.currentTeam.players.length
+          roundNumber % this.currentTeam.players.length
       } else {
         this.current.playerIndex = 0
         this.current.teamIndex = 0
@@ -300,7 +291,7 @@ export const useX01Store = defineStore('X01', {
     },
 
     // finir le tour
-    endRound() {
+    endRound(): Round {
       if (this.current.isBust) {
         // Rollback -> restore le score d'avant la volée
         this.currentTeam.score = this.current.scoreSnapshot
@@ -310,17 +301,19 @@ export const useX01Store = defineStore('X01', {
       }
 
       // Sauvegarder dans l'historique
-      this.gameHistory.unshift({
+      const result: Round = {
         teamIndex: this.current.teamIndex,
         playerIndex: this.current.playerIndex,
         throws: [...this.current.dartThrows],
         isBust: this.current.isBust,
         isWinner: this.currentScore === 0,
         score: this.currentTeam.score,
-      })
+      }
 
       this.current.isBust = false
       this.current.dartThrows = []
+
+      return result
     },
 
     // reset du state
@@ -343,7 +336,6 @@ export const useX01Store = defineStore('X01', {
       }
 
       this.teams = []
-      this.gameHistory = []
     },
   },
 })

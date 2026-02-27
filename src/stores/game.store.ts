@@ -3,11 +3,7 @@ import { STATUS } from '@/models/enums/status.enum'
 import type { TwoHundredTwentyOneOptions } from '@/models/interfaces/two-hundred-twenty-one.interface'
 import type { AtcOptions } from '@/models/interfaces/arround-the-clock.interface'
 import type { CricketOptions } from '@/models/interfaces/cricket.interface'
-import type { DartThrow } from '@/models/interfaces/dart-throw.interface'
-import type {
-  Team,
-  Player,
-} from '@/models/interfaces/player.interface'
+import type { Team } from '@/models/interfaces/player.interface'
 import type { Round } from '@/models/interfaces/round.interface'
 import type { X01Options } from '@/models/interfaces/x01.interface'
 import { defineStore } from 'pinia'
@@ -25,9 +21,6 @@ export interface GameState {
   teams: Team[]
   gameHistory: Round[]
   teamWinner: number | undefined
-
-  activeTeamIndex: number
-  activePlayerIndex: number
   roundNumber: number
 }
 
@@ -42,35 +35,22 @@ export const useGameStore = defineStore('game', {
       gameHistory: [],
       teamWinner: undefined,
 
-      activeTeamIndex: 0,
-      activePlayerIndex: 0,
       roundNumber: 1,
     }) as GameState,
 
   getters: {
-    activeTeamPlayers(): Player[] {
-      return this.teams[this.activeTeamIndex]?.players ?? []
-    },
-    activePlayer(): Player | undefined {
-      return (
-        this.activeTeamPlayers[this.activePlayerIndex] ??
-        undefined
-      )
-    },
-
     isPlaying(): boolean {
       return this.status === STATUS.PLAYING
     },
     isFinished(): boolean {
       return this.status === STATUS.FINISHED
     },
-
-    teamHistory: (state) => {
-      return (teamIndex: number): Round[] => {
-        return state.gameHistory.filter(
-          (r) => r.teamIndex === teamIndex,
-        )
-      }
+    // Donnes le nombre de round joué
+    roundNumber(): number {
+      return (
+        Math.floor(this.gameHistory.length / this.teams.length) +
+        1
+      )
     },
   },
 
@@ -89,39 +69,13 @@ export const useGameStore = defineStore('game', {
       this.teams = payload.teams
       this.gameHistory = []
       this.teamWinner = undefined
-      this.activeTeamIndex = 0
-      this.activePlayerIndex = 0
       this.roundNumber = 1
       this.status = STATUS.PLAYING
     },
 
-    commitRound(throws: DartThrow[]) {
-      const round: Round = {
-        teamIndex: this.activeTeamIndex,
-        playerIndex: 0,
-        isBust: false,
-        isWinner: false,
-        score: 0,
-
-        throws,
-      }
-      this.gameHistory.push(round)
-
-      // Check if winner
-      if (this.teamWinner !== undefined) {
-        this.status = STATUS.FINISHED
-        return
-      }
-
-      this.activePlayerIndex =
-        (this.activePlayerIndex + 1) %
-        this.activeTeamPlayers.length
-
-      if (this.activeTeamIndex === this.teams.length - 1) {
-        this.roundNumber++
-      }
-      this.activeTeamIndex =
-        (this.activeTeamIndex + 1) % this.teams.length
+    commitRound(round: Round) {
+      this.gameHistory.unshift(round)
+      this.roundNumber++
     },
 
     setWinner(teamIndex: number) {
@@ -134,14 +88,6 @@ export const useGameStore = defineStore('game', {
       })
     },
 
-    subtractPoints(teamIndex: number, amount: number) {
-      this.teams[teamIndex]!.score -= amount
-    },
-
-    addPoints(teamIndex: number, amount: number) {
-      this.teams[teamIndex]!.score += amount
-    },
-
     setPoints(teamIndex: number, value: number) {
       this.teams[teamIndex]!.score = value
     },
@@ -150,8 +96,6 @@ export const useGameStore = defineStore('game', {
       this.gameMode = undefined
       this.gameHistory = []
       this.teamWinner = undefined
-      this.activeTeamIndex = 0
-      this.activePlayerIndex = 0
       this.roundNumber = 1
       this.status = STATUS.SETUP
     },
