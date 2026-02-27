@@ -71,7 +71,7 @@
         "
         @dart-thrown="onDartThrown"
         @validate="onRoundComplete"
-        @undo="x01Store.cancelThrow()"
+        @undo="undoThrow"
       />
     </div>
   </GameBarLayout>
@@ -127,7 +127,13 @@ function onRoundComplete() {
     game.status = STATUS.FINISHED
   if (!game.isFinished)
     x01Store.initRound(game.roundNumber, game.gameHistory.length)
+
   scrollToStart()
+}
+// Annulation du lancée
+function undoThrow() {
+  x01Store.cancelThrow()
+  game.unsetWinner()
 }
 
 // Quit
@@ -166,7 +172,7 @@ watch(
   () => game.isFinished,
   (finished) => {
     if (finished)
-      setTimeout(() => router.push({ name: 'winner' }), 600)
+      setTimeout(() => router.push({ name: 'winner' }), 100)
   },
 )
 

@@ -210,7 +210,6 @@ const props = withDefaults(defineProps<Props>(), {
 }
 
 .sc-badge--winner {
-  font-size: 14px;
   padding: 0;
 }
 

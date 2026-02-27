@@ -89,6 +89,10 @@ export const useGameStore = defineStore('game', {
       this.teamWinner = teamIndex
     },
 
+    unsetWinner() {
+      this.teamWinner = undefined
+    },
+
     resetPlayerPoints() {
       this.teams.forEach((team: Team) => {
         team.score = 0
