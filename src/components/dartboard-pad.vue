@@ -134,6 +134,7 @@ function hitBull() {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
+  padding-bottom: 12px;
 }
 
 .pad-btn {
@@ -187,6 +188,7 @@ function hitBull() {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
+  padding-bottom: 12px;
 }
 
 .num-btn {
