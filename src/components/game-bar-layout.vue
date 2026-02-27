@@ -1,6 +1,6 @@
 <template>
   <div class="game-layout">
-    <!-- ── Barre de statut ── -->
+    <!-- Barre de statut -->
     <header class="game-bar">
       <div class="bar-left">
         <button
@@ -28,12 +28,12 @@
       </div>
     </header>
 
-    <!-- ── Contenu de la vue ── -->
+    <!-- Contenu de la vue -->
     <main class="game-content">
       <slot />
     </main>
 
-    <!-- ── Menu pause ── -->
+    <!-- Menu pause -->
     <Transition name="menu">
       <div
         class="menu-overlay"
@@ -44,7 +44,7 @@
           <div class="menu-header">
             <span class="menu-title">🎯 Partie en cours</span>
             <button
-              class="btn-close"
+              class="btn-menu"
               @click="state.showMenu = false"
             >
               ✕
@@ -58,7 +58,7 @@
               ▶ Reprendre
             </button>
             <button
-              class="menu-item menu-item--danger"
+              class="menu-item danger"
               @click="emit('quit')"
             >
               🚪 Quitter
@@ -101,7 +101,7 @@ const state: GameBarLayout = reactive({
   overflow-y: scroll;
 }
 
-/* ── Barre ── */
+/* Barre */
 .game-bar {
   display: flex;
   align-items: center;
@@ -139,13 +139,8 @@ const state: GameBarLayout = reactive({
   border: none;
   color: var(--cs-subtle);
   font-size: 18px;
-  cursor: pointer;
   padding: 4px 6px 7px;
-  border-radius: 6px;
   text-align: center;
-  transition:
-    color var(--transition),
-    background var(--transition);
 }
 .btn-menu:hover {
   color: var(--cs-text);
@@ -188,7 +183,7 @@ const state: GameBarLayout = reactive({
   text-align: right;
 }
 
-/* ── Contenu ── */
+/* Contenu */
 .game-content {
   flex: 1;
   display: flex;
@@ -197,7 +192,7 @@ const state: GameBarLayout = reactive({
   padding: 12px;
 }
 
-/* ── Menu pause ── */
+/* Menu pause */
 .menu-overlay {
   position: fixed;
   inset: 0;
@@ -230,20 +225,6 @@ const state: GameBarLayout = reactive({
   letter-spacing: 0.06em;
 }
 
-.btn-close {
-  background: transparent;
-  border: none;
-  color: var(--cs-muted);
-  font-size: 16px;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 6px;
-  transition: color var(--transition);
-}
-.btn-close:hover {
-  color: var(--cs-text);
-}
-
 .menu-body {
   padding: 12px 20px;
   display: flex;
@@ -253,41 +234,11 @@ const state: GameBarLayout = reactive({
 
 .menu-item {
   text-align: left;
-  padding: 14px 16px;
-  font-size: 15px;
+  padding: 16px 0;
   font-family: inherit;
-  background: var(--cs-overlay);
-  color: var(--cs-text);
-  border: 1px solid transparent;
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: all var(--transition);
-  letter-spacing: 0.04em;
-}
-.menu-item:hover {
-  border-color: color-mix(
-    in srgb,
-    var(--cs-muted) 30%,
-    transparent
-  );
-}
-.menu-item--danger {
-  color: var(--cs-red);
-}
-.menu-item--danger:hover {
-  background: color-mix(
-    in srgb,
-    var(--cs-red) 10%,
-    var(--cs-overlay)
-  );
-  border-color: color-mix(
-    in srgb,
-    var(--cs-red) 30%,
-    transparent
-  );
 }
 
-/* ── Transitions menu ── */
+/* Transitions menu */
 .menu-enter-active,
 .menu-leave-active {
   transition: opacity 0.25s ease;

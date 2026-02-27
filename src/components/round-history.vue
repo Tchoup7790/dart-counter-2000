@@ -32,12 +32,6 @@
               v-for="(dart, j) in round.throws"
               :key="j"
               class="rh-dart"
-              :class="{
-                'rh-dart--double': dart.multiplier === 2,
-                'rh-dart--triple': dart.multiplier === 3,
-                'rh-dart--bull': dart.sector === 50,
-                'rh-dart--single-bull': dart.sector === 25,
-              }"
               >{{ label(dart) }}</span
             >
           </template>
@@ -75,7 +69,7 @@ function label(t: DartThrow): string {
 
 .rh-title {
   margin: 0;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--cs-muted);
@@ -85,7 +79,7 @@ function label(t: DartThrow): string {
 .rh-list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
 }
 
 .rh-row {
@@ -94,7 +88,7 @@ function label(t: DartThrow): string {
   gap: 12px;
   padding: 12px 14px;
   background: var(--cs-surface);
-  border: 1px solid var(--cs-muted);
+  border: 1.5px solid var(--cs-overlay);
   border-radius: 7px;
 }
 
@@ -125,23 +119,7 @@ function label(t: DartThrow): string {
   color: var(--cs-subtle);
   letter-spacing: 0.03em;
 }
-.rh-dart--double {
-  color: var(--cs-green);
-  font-weight: 700;
-}
-.rh-dart--triple {
-  color: var(--cs-red);
-  font-weight: 700;
-}
 
-.rh-dart--single-bull {
-  font-weight: 700;
-}
-
-.rh-dart--bull {
-  color: var(--cs-red);
-  font-weight: 700;
-}
 .rh-bust-label {
   font-size: 10px;
   font-weight: 700;

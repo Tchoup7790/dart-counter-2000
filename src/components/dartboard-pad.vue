@@ -5,7 +5,7 @@
       <button
         v-for="mult in [1, 2, 3] as const"
         :key="mult"
-        class="mult-btn"
+        class="pad-btn"
         :class="{
           'mult-btn--active-s':
             state.multiplier === mult && mult === 1,
@@ -32,7 +32,7 @@
         <button
           v-for="n in row"
           :key="n"
-          class="num-btn"
+          class="num-btn pad-btn"
           @click="hitNumber(n)"
         >
           {{ n }}
@@ -43,14 +43,16 @@
     <!-- Bull -->
     <div class="bottom-row">
       <button
-        class="bull-btn"
-        :class="{ 'bull-btn--disabled': state.multiplier === 3 }"
+        class="bottom-btn -"
+        :class="{
+          'bottom-btn--disabled': state.multiplier === 3,
+        }"
         :disabled="state.multiplier === 3"
         @click="hitBull()"
       >
         Bull
       </button>
-      <button class="danger out-btn" @click="hitNumber(0)">
+      <button class="danger bottom-btn" @click="hitNumber(0)">
         Out
       </button>
     </div>
@@ -134,20 +136,18 @@ function hitBull() {
   gap: 16px;
 }
 
-.mult-btn {
-  padding: 14px 0;
-  font-size: 16px;
+.pad-btn {
+  font-size: 14px;
   font-weight: 900;
-  font-family: inherit;
-  letter-spacing: 0.1em;
-  border-radius: var(--radius);
-  cursor: pointer;
-  border: 2px solid
-    color-mix(in srgb, var(--cs-muted) 20%, transparent);
+  border-color: color-mix(
+    in srgb,
+    var(--cs-muted) 20%,
+    transparent
+  );
   background: var(--cs-overlay);
   color: var(--cs-muted);
-  transition: all 0.15s ease;
 }
+
 .mult-btn--active-s {
   background: color-mix(
     in srgb,
@@ -160,25 +160,26 @@ function hitBull() {
     color-mix(in srgb, var(--cs-text) 15%, transparent);
 }
 .mult-btn--active-d {
-  background: color-mix(in srgb, #2ecc71 12%, var(--cs-surface));
-  border-color: #2ecc71;
-  color: #2ecc71;
+  background: color-mix(
+    in srgb,
+    var(--cs-green) 12%,
+    var(--cs-surface)
+  );
+  border-color: var(--cs-green);
+  color: var(--cs-green);
   box-shadow: 0 0 12px
-    color-mix(in srgb, #2ecc71 20%, transparent);
+    color-mix(in srgb, var(--cs-green) 20%, transparent);
 }
-
 .mult-btn--active-t {
-  background: color-mix(in srgb, #c0392b 12%, var(--cs-surface));
-  border-color: #c0392b;
-  color: #c0392b;
+  background: color-mix(
+    in srgb,
+    var(--cs-red) 12%,
+    var(--cs-surface)
+  );
+  border-color: var(--cs-red);
+  color: var(--cs-red);
   box-shadow: 0 0 12px
-    color-mix(in srgb, #c0392b 20%, transparent);
-}
-
-.mult-btn:not(.mult-btn--active-s):not(.mult-btn--active-d):not(
-    .mult-btn--active-t
-  ):active {
-  background: var(--cs-surface);
+    color-mix(in srgb, var(--cs-red) 20%, transparent);
 }
 
 /* Grille numéros */
@@ -189,32 +190,18 @@ function hitBull() {
 }
 
 .num-btn {
-  padding: 16px 0;
-  font-size: 16px;
-  font-weight: 700;
-  font-family: inherit;
-  border-radius: var(--radius);
-  cursor: pointer;
-  background: var(--cs-surface);
-  color: var(--cs-text);
-  border: 1px solid
-    color-mix(in srgb, var(--cs-muted) 18%, transparent);
-  transition: all 0.1s ease;
-  -webkit-tap-highlight-color: transparent;
+  padding: 17px 0;
 }
 
+.num-btn:hover,
 .num-btn:active {
   background: color-mix(
     in srgb,
     var(--cs-text) 10%,
     var(--cs-surface)
   );
-  transform: scale(0.94);
-  border-color: color-mix(
-    in srgb,
-    var(--cs-muted) 40%,
-    transparent
-  );
+  border-color: var(--cs-text);
+  color: var(--cs-text);
 }
 
 /* Bull */
@@ -223,28 +210,16 @@ function hitBull() {
   gap: 16px;
 }
 
-.bull-btn {
+.bottom-btn {
   flex: 1;
-  padding: 14px 0;
-  border-radius: var(--radius);
-  font-size: 16px;
+  padding: 18px 0;
+
+  font-size: 14px;
   font-weight: 900;
-  font-family: inherit;
-  -webkit-tap-highlight-color: transparent;
 }
 
-.out-btn {
-  flex: 1;
-  padding: 14px 0;
-  border-radius: var(--radius);
-  font-size: 16px;
-  font-weight: 900;
-  font-family: inherit;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.bull-btn--disabled,
-.bull-btn:disabled {
+.bottom-btn--disabled,
+.bottom-btn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
   pointer-events: none;

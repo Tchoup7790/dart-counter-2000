@@ -18,10 +18,6 @@
           v-for="(dart, i) in props.currentThrows"
           :key="`throw-${i}`"
           class="throw-badge"
-          :style="{
-            borderColor: props.activeTeamColor,
-            color: props.activeTeamColor,
-          }"
           >{{ giveThrowLabel(dart) }}</span
         >
         <span
@@ -88,24 +84,24 @@ function giveThrowLabel(dart: DartThrow) {
 
 .throw-summary {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
 }
 
 .throw-badge {
-  padding: 6px 10px;
+  padding: 6px;
   border: 1px solid;
   border-radius: 6px;
-  font-family: inherit;
   font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.04em;
   text-align: center;
+  border-color: var(--cs-muted);
+  color: var(--cs-muted);
 }
 
 .throw-badge--empty {
-  border-color: var(--cs-muted);
-  color: var(--cs-muted);
+  border-color: var(--cs-surface);
+  color: var(--cs-text);
   opacity: 0.35;
 }
 
@@ -123,68 +119,13 @@ function giveThrowLabel(dart: DartThrow) {
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  padding: 10px 20px;
-  border-radius: var(--radius);
-  cursor: pointer;
-  font-family: inherit;
-  transition: all var(--transition);
+  padding: 10px auto;
 }
 
 .ctrl-btn:disabled {
   opacity: 0.28;
   cursor: not-allowed;
   pointer-events: none;
-}
-
-.ctrl-btn--undo {
-  color: var(--cs-red);
-  background: color-mix(
-    in srgb,
-    var(--cs-red) 8%,
-    var(--cs-surface)
-  );
-  border: 1px solid
-    color-mix(in srgb, var(--cs-red) 20%, transparent);
-}
-.ctrl-btn--undo:not(:disabled):hover {
-  background: color-mix(
-    in srgb,
-    var(--cs-red) 16%,
-    var(--cs-surface)
-  );
-  border-color: color-mix(
-    in srgb,
-    var(--cs-red) 45%,
-    transparent
-  );
-}
-
-.ctrl-btn--validate {
-  color: var(--cs-green);
-  background: color-mix(
-    in srgb,
-    var(--cs-green) 10%,
-    var(--cs-surface)
-  );
-  border: 1px solid
-    color-mix(in srgb, var(--cs-green) 22%, transparent);
-}
-.ctrl-btn--validate:not(:disabled):hover {
-  background: color-mix(
-    in srgb,
-    var(--cs-green) 20%,
-    var(--cs-surface)
-  );
-  border-color: color-mix(
-    in srgb,
-    var(--cs-green) 50%,
-    transparent
-  );
-  box-shadow: 0 0 14px
-    color-mix(in srgb, var(--cs-green) 15%, transparent);
-}
-.ctrl-btn--validate:not(:disabled):active {
-  transform: scale(0.97);
 }
 
 .ctrl-icon {

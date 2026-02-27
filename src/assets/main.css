@@ -108,7 +108,7 @@ button {
     transparent
   );
   color: var(--color-primary);
-  border: 1px solid
+  border: 1.5px solid
     color-mix(in srgb, var(--color-primary) 30%, transparent);
   border-radius: var(--radius);
 
@@ -121,6 +121,8 @@ button {
     border-color var(--transition),
     color var(--transition),
     box-shadow var(--transition);
+
+  -webkit-tap-highlight-color: transparent;
 }
 
 button:hover {

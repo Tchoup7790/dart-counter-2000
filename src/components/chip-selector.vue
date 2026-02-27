@@ -53,7 +53,7 @@ defineEmits<{
   font-family: inherit;
   background: var(--cs-overlay);
   color: var(--cs-subtle);
-  border: 1px solid
+  border: 1.5px solid
     color-mix(in srgb, var(--cs-muted) 30%, transparent);
   border-radius: 6px;
   cursor: pointer;

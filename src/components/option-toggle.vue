@@ -74,7 +74,7 @@ defineEmits<{
   height: 22px;
   border-radius: 11px;
   background: var(--cs-overlay);
-  border: 1px solid
+  border: 1.5px solid
     color-mix(in srgb, var(--cs-muted) 30%, transparent);
   position: relative;
   transition:
