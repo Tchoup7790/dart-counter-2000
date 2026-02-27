@@ -10,7 +10,9 @@
         >
           ☰
         </button>
-        <span class="mode-tag">{{ props.modeName }}</span>
+        <span class="mode-tag mode-tag-main">
+          {{ props.modeName }}</span
+        >
       </div>
 
       <div class="bar-center">
@@ -18,13 +20,21 @@
         <span class="round-number">{{ props.roundNumber }}</span>
       </div>
 
-      <div class="bar-right">
+      <div class="bar-right mode">
         <span
           class="turn-indicator"
           :style="{ color: props.activeTeamColor }"
         >
           {{ props.activeName }}
         </span>
+        <div class="mode-options">
+          <span
+            class="mode-tag"
+            v-for="(option, index) in props.options"
+            :key="index"
+            >{{ option }}</span
+          >
+        </div>
       </div>
     </header>
 
@@ -76,6 +86,7 @@ const props = defineProps<{
   activeTeamColor: string
   roundNumber: number
   modeName: string
+  options: string[]
 }>()
 
 const emit = defineEmits<{
@@ -132,6 +143,7 @@ const state: GameBarLayout = reactive({
   display: flex;
   align-items: center;
   text-align: center;
+  flex: 1;
   gap: 8px;
   min-width: 90px;
 }
@@ -144,12 +156,28 @@ const state: GameBarLayout = reactive({
   border: none;
   color: var(--cs-subtle);
   font-size: 18px;
-  padding: 4px 6px 7px;
+  padding: 0 6px;
   text-align: center;
 }
 .btn-menu:hover {
   color: var(--cs-text);
   box-shadow: none;
+}
+
+.mode {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  gap: 4px;
+}
+
+.mode-options {
+  display: flex;
+  gap: 4px;
+}
+
+.mode-options > span {
+  font-size: 8px;
 }
 
 .mode-tag {
@@ -158,8 +186,16 @@ const state: GameBarLayout = reactive({
   color: var(--cs-muted);
   border: 1px solid
     color-mix(in srgb, var(--cs-muted) 25%, transparent);
-  padding: 2px 7px;
+  padding: 2px 5px;
   border-radius: 4px;
+}
+
+.mode-tag-main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--cs-subtle);
+  border-color: var(--cs-subtle);
 }
 
 .bar-center {

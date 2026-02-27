@@ -14,7 +14,13 @@
     :active-team-color="
       x01Store.currentTeam.color ?? 'var(--cs-green)'
     "
-    :mode-name="GameMode.X01"
+    :mode-name="`${x01Store.options.startingPoints}`"
+    :options="[
+      `${x01Store.options.doubleIn ? 'D-In' : ''}`,
+      `${x01Store.options.masterIn ? 'M-In' : ''}`,
+      `${x01Store.options.doubleOut ? 'D-Out' : ''}`,
+      `${x01Store.options.masterOut ? 'M-Out' : ''}`,
+    ]"
     :round-number="game.roundNumber"
     @quit="quitGame"
   >
@@ -78,7 +84,6 @@ import GameBarLayout from '@/components/game-bar-layout.vue'
 import ScoreCard from '@/components/score-card.vue'
 import GameBoard from '@/components/game-board.vue'
 import { useGameStore } from '@/stores/game.store'
-import { GameMode } from '@/models/enums/game-mode.enum'
 import { STATUS } from '@/models/enums/status.enum'
 
 const x01Store = useX01Store()
