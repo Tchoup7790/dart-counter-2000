@@ -98,6 +98,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGameStore } from '@/stores/game.store'
 import RoundHistory from '@/components/round-history.vue'
+import type { GameMode } from '@/models/enums/game-mode.enum'
 
 const game = useGameStore()
 const router = useRouter()
@@ -159,7 +160,11 @@ function goHome() {
 }
 function restart() {
   game.restart()
-  router.push({ name: 'setup' })
+  const mode: GameMode | undefined = game.gameMode
+  if (mode === undefined) {
+    goHome()
+  }
+  router.push({ name: 'setup', params: { mode } })
 }
 </script>
 
