@@ -363,6 +363,7 @@ onMounted(() => {
       })
     } else {
       state.teams = game.teams
+      state.teamMode = true
     }
   }
 

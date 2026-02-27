@@ -10,9 +10,12 @@
         >
           ☰
         </button>
-        <span class="mode-tag mode-tag-main">
-          {{ props.modeName }}</span
+        <span
+          class="turn-indicator"
+          :style="{ color: props.activeTeamColor }"
         >
+          {{ props.activeName }}
+        </span>
       </div>
 
       <div class="bar-center">
@@ -21,18 +24,15 @@
       </div>
 
       <div class="bar-right mode">
-        <span
-          class="turn-indicator"
-          :style="{ color: props.activeTeamColor }"
+        <span class="mode-tag mode-tag-main">
+          {{ props.modeName }}</span
         >
-          {{ props.activeName }}
-        </span>
         <div class="mode-options">
           <span
             class="mode-tag"
             v-for="(option, index) in props.options"
             :key="index"
-            >{{ option }}</span
+            >-{{ option }}</span
           >
         </div>
       </div>
@@ -86,7 +86,7 @@ const props = defineProps<{
   activeTeamColor: string
   roundNumber: number
   modeName: string
-  options: string[]
+  options: Array<string | false>
 }>()
 
 const emit = defineEmits<{
@@ -166,28 +166,20 @@ const state: GameBarLayout = reactive({
 
 .mode {
   display: flex;
-  flex-direction: column;
   align-items: end;
-  gap: 4px;
+  gap: 0;
 }
 
 .mode-options {
   display: flex;
-  gap: 4px;
-}
-
-.mode-options > span {
-  font-size: 8px;
+  gap: 0;
 }
 
 .mode-tag {
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.12em;
   color: var(--cs-muted);
-  border: 1px solid
-    color-mix(in srgb, var(--cs-muted) 25%, transparent);
-  padding: 2px 5px;
-  border-radius: 4px;
+  padding: 2pxx;
 }
 
 .mode-tag-main {
@@ -195,7 +187,6 @@ const state: GameBarLayout = reactive({
   justify-content: center;
   align-items: center;
   color: var(--cs-subtle);
-  border-color: var(--cs-subtle);
 }
 
 .bar-center {

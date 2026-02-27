@@ -8,7 +8,7 @@
         aria-label="Annuler le dernier lancer"
         @click="emit('undo')"
       >
-        <span class="ctrl-icon">↩</span>
+        <span class="ctrl-icon">↩︎</span>
         <span class="ctrl-label">Annuler</span>
       </button>
 

@@ -2,7 +2,7 @@
   <GameBarLayout
     :activeName="
       x01Store.currentTeam.players.length > 1
-        ? `${x01Store.currentTeam.name} > ${
+        ? `${
             x01Store.currentTeam.players[
               x01Store.current.playerIndex
             ]!.name
@@ -15,12 +15,14 @@
       x01Store.currentTeam.color ?? 'var(--cs-green)'
     "
     :mode-name="`${x01Store.options.startingPoints}`"
-    :options="[
-      `${x01Store.options.doubleIn ? 'D-In' : ''}`,
-      `${x01Store.options.masterIn ? 'M-In' : ''}`,
-      `${x01Store.options.doubleOut ? 'D-Out' : ''}`,
-      `${x01Store.options.masterOut ? 'M-Out' : ''}`,
-    ]"
+    :options="
+      [
+        x01Store.options.doubleIn && 'DI',
+        x01Store.options.masterIn && 'MI',
+        x01Store.options.doubleOut && 'DO',
+        x01Store.options.masterOut && 'MO',
+      ].filter(Boolean)
+    "
     :round-number="game.roundNumber"
     @quit="quitGame"
   >
