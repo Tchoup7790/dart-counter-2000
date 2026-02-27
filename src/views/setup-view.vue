@@ -349,7 +349,44 @@ const state: SetupViewState = reactive({
   atcOptions: { mustDouble: false },
 })
 
-onMounted(() => setTimeout(() => (state.visible = true), 50))
+onMounted(() => {
+  // Remettre les joueurs s'il y en avait précédemment
+  if (game.teams.length >= 1) {
+    if (game.teams.every((t) => t.players.length === 1)) {
+      const players: SoloPlayer[] = []
+      game.teams.forEach((t) => {
+        players.push({
+          id: t.players[0]!.id,
+          color: t.color,
+          name: t.players[0]!.name,
+        } as SoloPlayer)
+      })
+    } else {
+      state.teams = game.teams
+    }
+  }
+
+  // Remettre les paramètres s'il y en avait
+  if (game.options !== undefined) {
+    switch (game.gameMode) {
+      case GameMode.X01:
+        state.x01Options = game.options as X01Options
+        break
+      case GameMode.TWO_HUNDRED_TWENTY_ONE:
+        state.twoHundredTwentyOneOptions =
+          game.options as TwoHundredTwentyOneOptions
+        break
+      case GameMode.CRICKET:
+        state.cricketOptions = game.options as CricketOptions
+        break
+      case GameMode.ATC:
+        state.atcOptions = game.options as AtcOptions
+        break
+    }
+  }
+
+  setTimeout(() => (state.visible = true), 50)
+})
 
 // Mode
 const mode = route.params.mode as GameMode
